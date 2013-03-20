@@ -337,7 +337,7 @@ public class HtmlParserTest {
     }
 
     @Test public void handlesSolidusAtAttributeEnd() {
-        // this test makes sure [<a href=/>link</a>] is parsed as [<a href="/">link</a>], not [<a href="" /><a>link</a>]
+        // this org.jsoup.test makes sure [<a href=/>link</a>] is parsed as [<a href="/">link</a>], not [<a href="" /><a>link</a>]
         String h = "<a href=/>link</a>";
         Document doc = Jsoup.parse(h);
         assertEquals("<a href=\"/\">link</a>", doc.body().html());
@@ -557,7 +557,7 @@ public class HtmlParserTest {
     }
 
     @Test public void handlesSolidusInA() {
-        // test for bug #66
+        // org.jsoup.test for bug #66
         String h = "<a class=lp href=/lib/14160711/>link text</a>";
         Document doc = Jsoup.parse(h);
         Element a = doc.select("a").first();
@@ -566,11 +566,11 @@ public class HtmlParserTest {
     }
 
     @Test public void handlesSpanInTbody() {
-        // test for bug 64
+        // org.jsoup.test for bug 64
         String h = "<table><tbody><span class='1'><tr><td>One</td></tr><tr><td>Two</td></tr></span></tbody></table>";
         Document doc = Jsoup.parse(h);
-        assertEquals(doc.select("span").first().children().size(), 0); // the span gets closed
-        assertEquals(doc.select("table").size(), 1); // only one table
+        assertEquals(0, doc.select("span").first().children().size()); // the span gets closed
+        assertEquals(1, doc.select("table").size()); // only one table
     }
 
     @Test public void handlesUnclosedTitleAtEof() {
@@ -733,7 +733,7 @@ public class HtmlParserTest {
         // extended entities need a ; at the end to match, base does not
         String html = "&amp &quot &reg &icy &hopf &icy; &hopf;";
         Document doc = Jsoup.parse(html);
-        doc.outputSettings().escapeMode(Entities.EscapeMode.extended); // modifies output only to clarify test
+        doc.outputSettings().escapeMode(Entities.EscapeMode.extendedHtml); // modifies output only to clarify org.jsoup.test
         assertEquals(StringUtil.normaliseWhitespace("&amp; &quot; &reg; &amp;icy &amp;hopf &icy; &hopf;"), doc.body().html());
     }
 

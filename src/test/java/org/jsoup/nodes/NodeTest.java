@@ -32,7 +32,7 @@ public class NodeTest {
 
         Element dodgyBase = new Element(tag, "wtf://no-such-protocol/", attribs);
         assertEquals("http://bar/qux", dodgyBase.absUrl("absHref")); // base fails, but href good, so get that
-        assertEquals("", dodgyBase.absUrl("relHref")); // base fails, only rel href, so return nothing 
+        assertEquals("", dodgyBase.absUrl("relHref")); // base fails, only rel href, so return nothing
     }
 
     @Test public void setBaseUriIsRecursive() {
@@ -132,8 +132,8 @@ public class NodeTest {
     @Test public void ownerDocument() {
         Document doc = Jsoup.parse("<p>Hello");
         Element p = doc.select("p").first();
-        assertTrue(p.ownerDocument() == doc);
-        assertTrue(doc.ownerDocument() == doc);
+        assertSame(p.ownerDocument(), doc);
+        assertSame(doc.ownerDocument(), doc);
         assertNull(doc.parent());
     }
 
@@ -179,7 +179,7 @@ public class NodeTest {
         Element span = doc.select("span").first();
         Node node = span.unwrap();
         assertEquals("<div>One  Two</div>", TextUtil.stripNewlines(doc.body().html()));
-        assertTrue(node == null);
+        assertNull(node);
     }
 
     @Test public void traverse() {
@@ -187,11 +187,11 @@ public class NodeTest {
         final StringBuilder accum = new StringBuilder();
         doc.select("div").first().traverse(new NodeVisitor() {
             public void head(Node node, int depth) {
-                accum.append("<" + node.nodeName() + ">");
+                accum.append('<').append(node.nodeName()).append('>');
             }
 
             public void tail(Node node, int depth) {
-                accum.append("</" + node.nodeName() + ">");
+                accum.append("</").append(node.nodeName()).append('>');
             }
         });
         assertEquals("<div><p><#text></#text></p></div>", accum.toString());

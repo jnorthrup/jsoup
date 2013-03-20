@@ -8,7 +8,6 @@ import org.jsoup.select.*;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * A HTML element consists of a tag name, attributes, and child nodes (including text nodes and
@@ -19,6 +18,7 @@ import java.util.regex.PatternSyntaxException;
  * @author Jonathan Hedley, jonathan@hedley.net
  */
 public class Element extends Node {
+    private static final Pattern COMPILE = Pattern.compile("\\s+");
     private Tag tag;
     private Set<String> classNames;
     
@@ -92,7 +92,7 @@ public class Element extends Node {
      * 
      * @return true if block, false if not (and thus inline)
      */
-    public boolean isBlock() {
+    boolean isBlock() {
         return tag.isBlock();
     }
 
@@ -151,7 +151,7 @@ public class Element extends Node {
 
     private static void accumulateParents(Element el, Elements parents) {
         Element parent = el.parent();
-        if (parent != null && !parent.tagName().equals("#root")) {
+        if (parent != null && !"#root".equals(parent.tagName())) {
             parents.add(parent);
             accumulateParents(parent, parents);
         }
@@ -181,7 +181,7 @@ public class Element extends Node {
      */
     public Elements children() {
         // create on the fly rather than maintaining two lists. if gets slow, memoize, and mark dirty on change
-        List<Element> elements = new ArrayList<Element>();
+        List<Element> elements = new ArrayList<>();
         for (Node node : childNodes) {
             if (node instanceof Element)
                 elements.add((Element) node);
@@ -206,7 +206,7 @@ public class Element extends Node {
      * </ul>
      */
     public List<TextNode> textNodes() {
-        List<TextNode> textNodes = new ArrayList<TextNode>();
+        List<TextNode> textNodes = new ArrayList<>();
         for (Node node : childNodes) {
             if (node instanceof TextNode)
                 textNodes.add((TextNode) node);
@@ -223,7 +223,7 @@ public class Element extends Node {
      * @see #data()
      */
     public List<DataNode> dataNodes() {
-        List<DataNode> dataNodes = new ArrayList<DataNode>();
+        List<DataNode> dataNodes = new ArrayList<>();
         for (Node node : childNodes) {
             if (node instanceof DataNode)
                 dataNodes.add((DataNode) node);
@@ -242,11 +242,11 @@ public class Element extends Node {
      * <li>{@code el.select("a[href*=example.com]")} - finds links pointing to example.com (loosely)
      * </ul>
      * <p/>
-     * See the query syntax documentation in {@link org.jsoup.select.Selector}.
+     * See the query syntax documentation in {@link Selector}.
      *
      * @param cssQuery a {@link Selector} CSS-like query
      * @return elements that match the query (empty if none match)
-     * @see org.jsoup.select.Selector
+     * @see Selector
      */
     public Elements select(String cssQuery) {
         return Selector.select(cssQuery, this);
@@ -271,7 +271,7 @@ public class Element extends Node {
      * @param child node to add.
      * @return this element, so that you can add more child nodes or elements.
      */
-    public Element prependChild(Node child) {
+    Element prependChild(Node child) {
         Validate.notNull(child);
         
         addChildren(0, child);
@@ -294,7 +294,7 @@ public class Element extends Node {
         if (index < 0) index += currentSize +1; // roll around
         Validate.isTrue(index >= 0 && index <= currentSize, "Insert position out of bounds.");
 
-        ArrayList<Node> nodes = new ArrayList<Node>(children);
+        ArrayList<Node> nodes = new ArrayList<>(children);
         Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
         addChildren(index, nodeArray);
         return this;
@@ -456,7 +456,7 @@ public class Element extends Node {
         List<Element> elements = parent().children();
         Elements siblings = new Elements(elements.size() - 1);
         for (Element el: elements)
-            if (el != this)
+            if (!el.equals(this))
                 siblings.add(el);
         return siblings;
     }
@@ -474,10 +474,7 @@ public class Element extends Node {
         List<Element> siblings = parent().children();
         Integer index = indexInList(this, siblings);
         Validate.notNull(index);
-        if (siblings.size() > index+1)
-            return siblings.get(index+1);
-        else
-            return null;
+        return siblings.size() > index + 1 ? siblings.get(index + 1) : null;
     }
 
     /**
@@ -490,10 +487,7 @@ public class Element extends Node {
         List<Element> siblings = parent().children();
         Integer index = indexInList(this, siblings);
         Validate.notNull(index);
-        if (index > 0)
-            return siblings.get(index-1);
-        else
-            return null;
+        return index > 0 ? siblings.get(index - 1) : null;
     }
 
     /**
@@ -564,10 +558,7 @@ public class Element extends Node {
         Validate.notEmpty(id);
         
         Elements elements = Collector.collect(new Evaluator.Id(id), this);
-        if (elements.size() > 0)
-            return elements.get(0);
-        else
-            return null;
+        return elements.isEmpty() ? null : elements.get(0);
     }
 
     /**
@@ -593,25 +584,27 @@ public class Element extends Node {
      * @param key name of the attribute, e.g. {@code href}
      * @return elements that have this attribute, empty if none
      */
-    public Elements getElementsByAttribute(String key) {
+    public List getElementsByAttribute(String key) {
         Validate.notEmpty(key);
         key = key.trim().toLowerCase();
 
         return Collector.collect(new Evaluator.Attribute(key), this);
     }
 
-    /**
-     * Find elements that have an attribute name starting with the supplied prefix. Use {@code data-} to find elements
-     * that have HTML5 datasets.
-     * @param keyPrefix name prefix of the attribute e.g. {@code data-}
-     * @return elements that have attribute names that start with with the prefix, empty if none.
-     */
-    public Elements getElementsByAttributeStarting(String keyPrefix) {
-        Validate.notEmpty(keyPrefix);
-        keyPrefix = keyPrefix.trim().toLowerCase();
-
-        return Collector.collect(new Evaluator.AttributeStarting(keyPrefix), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that have an attribute name starting with the supplied prefix. Use {@code data-} to find elements
+//     * that have HTML5 datasets.
+//     * @param keyPrefix name prefix of the attribute e.g. {@code data-}
+//     * @return elements that have attribute names that start with with the prefix, empty if none.
+//     */
+//    public Elements getElementsByAttributeStarting(String keyPrefix) {
+//        Validate.notEmpty(keyPrefix);
+//        keyPrefix = keyPrefix.trim().toLowerCase();
+//
+//        return Collector.collect(new Evaluator.AttributeStarting(keyPrefix), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Find elements that have an attribute with the specific value. Case insensitive.
@@ -620,53 +613,61 @@ public class Element extends Node {
      * @param value value of the attribute
      * @return elements that have this attribute with this value, empty if none
      */
-    public Elements getElementsByAttributeValue(String key, String value) {
+    public List getElementsByAttributeValue(String key, String value) {
         return Collector.collect(new Evaluator.AttributeWithValue(key, value), this);
     }
 
-    /**
-     * Find elements that either do not have this attribute, or have it with a different value. Case insensitive.
-     * 
-     * @param key name of the attribute
-     * @param value value of the attribute
-     * @return elements that do not have a matching attribute
-     */
-    public Elements getElementsByAttributeValueNot(String key, String value) {
-        return Collector.collect(new Evaluator.AttributeWithValueNot(key, value), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that either do not have this attribute, or have it with a different value. Case insensitive.
+//     * 
+//     * @param key name of the attribute
+//     * @param value value of the attribute
+//     * @return elements that do not have a matching attribute
+//     */
+//    public Elements getElementsByAttributeValueNot(String key, String value) {
+//        return Collector.collect(new Evaluator.AttributeWithValueNot(key, value), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Find elements that have attributes that start with the value prefix. Case insensitive.
-     * 
-     * @param key name of the attribute
-     * @param valuePrefix start of attribute value
-     * @return elements that have attributes that start with the value prefix
-     */
-    public Elements getElementsByAttributeValueStarting(String key, String valuePrefix) {
-        return Collector.collect(new Evaluator.AttributeWithValueStarting(key, valuePrefix), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that have attributes that start with the value prefix. Case insensitive.
+//     * 
+//     * @param key name of the attribute
+//     * @param valuePrefix start of attribute value
+//     * @return elements that have attributes that start with the value prefix
+//     */
+//    public Elements getElementsByAttributeValueStarting(String key, String valuePrefix) {
+//        return Collector.collect(new Evaluator.AttributeWithValueStarting(key, valuePrefix), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Find elements that have attributes that end with the value suffix. Case insensitive.
-     * 
-     * @param key name of the attribute
-     * @param valueSuffix end of the attribute value
-     * @return elements that have attributes that end with the value suffix
-     */
-    public Elements getElementsByAttributeValueEnding(String key, String valueSuffix) {
-        return Collector.collect(new Evaluator.AttributeWithValueEnding(key, valueSuffix), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that have attributes that end with the value suffix. Case insensitive.
+//     * 
+//     * @param key name of the attribute
+//     * @param valueSuffix end of the attribute value
+//     * @return elements that have attributes that end with the value suffix
+//     */
+//    public Elements getElementsByAttributeValueEnding(String key, String valueSuffix) {
+//        return Collector.collect(new Evaluator.AttributeWithValueEnding(key, valueSuffix), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Find elements that have attributes whose value contains the match string. Case insensitive.
-     * 
-     * @param key name of the attribute
-     * @param match substring of value to search for
-     * @return elements that have attributes containing this text
-     */
-    public Elements getElementsByAttributeValueContaining(String key, String match) {
-        return Collector.collect(new Evaluator.AttributeWithValueContaining(key, match), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that have attributes whose value contains the match string. Case insensitive.
+//     * 
+//     * @param key name of the attribute
+//     * @param match substring of value to search for
+//     * @return elements that have attributes containing this text
+//     */
+//    public Elements getElementsByAttributeValueContaining(String key, String match) {
+//        return Collector.collect(new Evaluator.AttributeWithValueContaining(key, match), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     /**
      * Find elements that have attributes whose values match the supplied regular expression.
@@ -674,75 +675,87 @@ public class Element extends Node {
      * @param pattern compiled regular expression to match against attribute values
      * @return elements that have attributes matching this regular expression
      */
-    public Elements getElementsByAttributeValueMatching(String key, Pattern pattern) {
+    Elements getElementsByAttributeValueMatching(String key, Pattern pattern) {
         return Collector.collect(new Evaluator.AttributeWithValueMatching(key, pattern), this);
         
     }
     
-    /**
-     * Find elements that have attributes whose values match the supplied regular expression.
-     * @param key name of the attribute
-     * @param regex regular expression to match against attribute values. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
-     * @return elements that have attributes matching this regular expression
-     */
-    public Elements getElementsByAttributeValueMatching(String key, String regex) {
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(regex);
-        } catch (PatternSyntaxException e) {
-            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
-        }
-        return getElementsByAttributeValueMatching(key, pattern);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that have attributes whose values match the supplied regular expression.
+//     * @param key name of the attribute
+//     * @param regex regular expression to match against attribute values. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
+//     * @return elements that have attributes matching this regular expression
+//     */
+//    public Elements getElementsByAttributeValueMatching(String key, String regex) {
+//        Pattern pattern;
+//        try {
+//            pattern = Pattern.compile(regex);
+//        } catch (PatternSyntaxException e) {
+//            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
+//        }
+//        return getElementsByAttributeValueMatching(key, pattern);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
-    /**
-     * Find elements whose sibling index is less than the supplied index.
-     * @param index 0-based index
-     * @return elements less than index
-     */
-    public Elements getElementsByIndexLessThan(int index) {
-        return Collector.collect(new Evaluator.IndexLessThan(index), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements whose sibling index is less than the supplied index.
+//     * @param index 0-based index
+//     * @return elements less than index
+//     */
+//    public Elements getElementsByIndexLessThan(int index) {
+//        return Collector.collect(new Evaluator.IndexLessThan(index), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
-    /**
-     * Find elements whose sibling index is greater than the supplied index.
-     * @param index 0-based index
-     * @return elements greater than index
-     */
-    public Elements getElementsByIndexGreaterThan(int index) {
-        return Collector.collect(new Evaluator.IndexGreaterThan(index), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements whose sibling index is greater than the supplied index.
+//     * @param index 0-based index
+//     * @return elements greater than index
+//     */
+//    public Elements getElementsByIndexGreaterThan(int index) {
+//        return Collector.collect(new Evaluator.IndexGreaterThan(index), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
-    /**
-     * Find elements whose sibling index is equal to the supplied index.
-     * @param index 0-based index
-     * @return elements equal to index
-     */
-    public Elements getElementsByIndexEquals(int index) {
-        return Collector.collect(new Evaluator.IndexEquals(index), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements whose sibling index is equal to the supplied index.
+//     * @param index 0-based index
+//     * @return elements equal to index
+//     */
+//    public Elements getElementsByIndexEquals(int index) {
+//        return Collector.collect(new Evaluator.IndexEquals(index), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
-    /**
-     * Find elements that contain the specified string. The search is case insensitive. The text may appear directly
-     * in the element, or in any of its descendants.
-     * @param searchText to look for in the element's text
-     * @return elements that contain the string, case insensitive.
-     * @see Element#text()
-     */
-    public Elements getElementsContainingText(String searchText) {
-        return Collector.collect(new Evaluator.ContainsText(searchText), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that contain the specified string. The search is case insensitive. The text may appear directly
+//     * in the element, or in any of its descendants.
+//     * @param searchText to look for in the element's text
+//     * @return elements that contain the string, case insensitive.
+//     * @see Element#text()
+//     */
+//    public Elements getElementsContainingText(String searchText) {
+//        return Collector.collect(new Evaluator.ContainsText(searchText), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
-    /**
-     * Find elements that directly contain the specified string. The search is case insensitive. The text must appear directly
-     * in the element, not in any of its descendants.
-     * @param searchText to look for in the element's own text
-     * @return elements that contain the string, case insensitive.
-     * @see Element#ownText()
-     */
-    public Elements getElementsContainingOwnText(String searchText) {
-        return Collector.collect(new Evaluator.ContainsOwnText(searchText), this);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements that directly contain the specified string. The search is case insensitive. The text must appear directly
+//     * in the element, not in any of its descendants.
+//     * @param searchText to look for in the element's own text
+//     * @return elements that contain the string, case insensitive.
+//     * @see Element#ownText()
+//     */
+//    public Elements getElementsContainingOwnText(String searchText) {
+//        return Collector.collect(new Evaluator.ContainsOwnText(searchText), this);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     /**
      * Find elements whose text matches the supplied regular expression.
@@ -750,25 +763,27 @@ public class Element extends Node {
      * @return elements matching the supplied regular expression.
      * @see Element#text()
      */
-    public Elements getElementsMatchingText(Pattern pattern) {
+    Elements getElementsMatchingText(Pattern pattern) {
         return Collector.collect(new Evaluator.Matches(pattern), this);
     }
     
-    /**
-     * Find elements whose text matches the supplied regular expression.
-     * @param regex regular expression to match text against. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
-     * @return elements matching the supplied regular expression.
-     * @see Element#text()
-     */
-    public Elements getElementsMatchingText(String regex) {
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(regex);
-        } catch (PatternSyntaxException e) {
-            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
-        }
-        return getElementsMatchingText(pattern);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements whose text matches the supplied regular expression.
+//     * @param regex regular expression to match text against. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
+//     * @return elements matching the supplied regular expression.
+//     * @see Element#text()
+//     */
+//    public Elements getElementsMatchingText(String regex) {
+//        Pattern pattern;
+//        try {
+//            pattern = Pattern.compile(regex);
+//        } catch (PatternSyntaxException e) {
+//            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
+//        }
+//        return getElementsMatchingText(pattern);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     /**
      * Find elements whose own text matches the supplied regular expression.
@@ -776,32 +791,34 @@ public class Element extends Node {
      * @return elements matching the supplied regular expression.
      * @see Element#ownText()
      */
-    public Elements getElementsMatchingOwnText(Pattern pattern) {
+    Elements getElementsMatchingOwnText(Pattern pattern) {
         return Collector.collect(new Evaluator.MatchesOwn(pattern), this);
     }
     
-    /**
-     * Find elements whose text matches the supplied regular expression.
-     * @param regex regular expression to match text against. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
-     * @return elements matching the supplied regular expression.
-     * @see Element#ownText()
-     */
-    public Elements getElementsMatchingOwnText(String regex) {
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(regex);
-        } catch (PatternSyntaxException e) {
-            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
-        }
-        return getElementsMatchingOwnText(pattern);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Find elements whose text matches the supplied regular expression.
+//     * @param regex regular expression to match text against. You can use <a href="http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded">embedded flags</a> (such as (?i) and (?m) to control regex options.
+//     * @return elements matching the supplied regular expression.
+//     * @see Element#ownText()
+//     */
+//    public Elements getElementsMatchingOwnText(String regex) {
+//        Pattern pattern;
+//        try {
+//            pattern = Pattern.compile(regex);
+//        } catch (PatternSyntaxException e) {
+//            throw new IllegalArgumentException("Pattern syntax error: " + regex, e);
+//        }
+//        return getElementsMatchingOwnText(pattern);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     /**
      * Find all elements under this element (including self, and children of children).
      * 
      * @return all elements
      */
-    public Elements getAllElements() {
+    public Iterable <Element> getAllElements() {
         return Collector.collect(new Evaluator.AllElements(), this);
     }
 
@@ -824,9 +841,9 @@ public class Element extends Node {
                 } else if (node instanceof Element) {
                     Element element = (Element) node;
                     if (accum.length() > 0 &&
-                        (element.isBlock() || element.tag.getName().equals("br")) &&
+                        (element.isBlock() || "br".equals(element.tag.getName())) &&
                         !TextNode.lastCharIsWhitespace(accum))
-                        accum.append(" ");
+                        accum.append(' ');
                 }
             }
 
@@ -876,8 +893,8 @@ public class Element extends Node {
     }
 
     private static void appendWhitespaceIfBr(Element element, StringBuilder accum) {
-        if (element.tag.getName().equals("br") && !TextNode.lastCharIsWhitespace(accum))
-            accum.append(" ");
+        if ("br".equals(element.tag.getName()) && !TextNode.lastCharIsWhitespace(accum))
+            accum.append(' ');
     }
 
     static boolean preserveWhitespace(Node node) {
@@ -958,13 +975,13 @@ public class Element extends Node {
     /**
      * Get all of the element's class names. E.g. on element {@code <div class="header gray"}>},
      * returns a set of two elements {@code "header", "gray"}. Note that modifications to this set are not pushed to
-     * the backing {@code class} attribute; use the {@link #classNames(java.util.Set)} method to persist them.
+     * the backing {@code class} attribute; use the {@link #classNames(Set)} method to persist them.
      * @return set of classnames, empty if no class attribute
      */
     public Set<String> classNames() {
         if (classNames == null) {
-            String[] names = className().split("\\s+");
-            classNames = new LinkedHashSet<String>(Arrays.asList(names));
+            String[] names = COMPILE.split(className());
+            classNames = new LinkedHashSet<>(Arrays.asList(names));
         }
         return classNames;
     }
@@ -974,9 +991,9 @@ public class Element extends Node {
      @param classNames set of classes
      @return this element, for chaining
      */
-    public Element classNames(Set<String> classNames) {
+    Element classNames(Collection<String> classNames) {
         Validate.notNull(classNames);
-        attributes.put("class", StringUtil.join(classNames, " "));
+        attributes.put("class", StringUtil.join(" ", classNames));
         return this;
     }
 
@@ -1047,10 +1064,7 @@ public class Element extends Node {
      * @return the value of the form element, or empty string if not set.
      */
     public String val() {
-        if (tagName().equals("textarea"))
-            return text();
-        else
-            return attr("value");
+        return "textarea".equals(tagName()) ? text() : attr("value");
     }
     
     /**
@@ -1059,7 +1073,7 @@ public class Element extends Node {
      * @return this element (for chaining)
      */
     public Element val(String value) {
-        if (tagName().equals("textarea"))
+        if ("textarea".equals(tagName()))
             text(value);
         else
             attr("value", value);
@@ -1067,24 +1081,24 @@ public class Element extends Node {
     }
 
     void outerHtmlHead(StringBuilder accum, int depth, Document.OutputSettings out) {
-        if (accum.length() > 0 && out.prettyPrint() && (tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock())))
+        if (accum.length() > 0 && out.prettyPrint() && (tag.formatAsBlock() || parent() != null && parent().tag().formatAsBlock()))
             indent(accum, depth, out);
         accum
-                .append("<")
+                .append('<')
                 .append(tagName());
         attributes.html(accum, out);
 
         if (childNodes.isEmpty() && tag.isSelfClosing())
             accum.append(" />");
         else
-            accum.append(">");
+            accum.append('>');
     }
 
     void outerHtmlTail(StringBuilder accum, int depth, Document.OutputSettings out) {
         if (!(childNodes.isEmpty() && tag.isSelfClosing())) {
             if (out.prettyPrint() && !childNodes.isEmpty() && tag.formatAsBlock())
                 indent(accum, depth, out);
-            accum.append("</").append(tagName()).append(">");
+            accum.append("</").append(tagName()).append('>');
         }
     }
 

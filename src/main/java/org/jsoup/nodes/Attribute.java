@@ -33,14 +33,16 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
         return key;
     }
 
-    /**
-     Set the attribute key. Gets normalised as per the constructor method.
-     @param key the new key; must not be null
-     */
-    public void setKey(String key) {
-        Validate.notEmpty(key);
-        this.key = key.trim().toLowerCase();
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     Set the attribute key. Gets normalised as per the constructor method.
+//     @param key the new key; must not be null
+//     */
+//    public void setKey(String key) {
+//        Validate.notEmpty(key);
+//        this.key = key.trim().toLowerCase();
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      Get the attribute value.
@@ -66,15 +68,15 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
      @return HTML
      */
     public String html() {
-        return key + "=\"" + Entities.escape(value, (new Document("")).outputSettings()) + "\"";
+        return key + "=\"" + Entities.escape(value, new Document("").outputSettings()) + '"';
     }
     
-    protected void html(StringBuilder accum, Document.OutputSettings out) {
+    void html(StringBuilder accum, Document.OutputSettings out) {
         accum
             .append(key)
             .append("=\"")
             .append(Entities.escape(value, out))
-            .append("\"");
+            .append('"');
     }
 
     /**
@@ -85,18 +87,20 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
         return html();
     }
 
-    /**
-     * Create a new Attribute from an unencoded key and a HTML attribute encoded value.
-     * @param unencodedKey assumes the key is not encoded, as can be only run of simple \w chars.
-     * @param encodedValue HTML attribute encoded value
-     * @return attribute
-     */
-    public static Attribute createFromEncoded(String unencodedKey, String encodedValue) {
-        String value = Entities.unescape(encodedValue, true);
-        return new Attribute(unencodedKey, value);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Create a new Attribute from an unencoded key and a HTML attribute encoded value.
+//     * @param unencodedKey assumes the key is not encoded, as can be only run of simple \w chars.
+//     * @param encodedValue HTML attribute encoded value
+//     * @return attribute
+//     */
+//    public static Attribute createFromEncoded(String unencodedKey, String encodedValue) {
+//        String value = Entities.unescape(encodedValue, true);
+//        return new Attribute(unencodedKey, value);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    protected boolean isDataAttribute() {
+    boolean isDataAttribute() {
         return key.startsWith(Attributes.dataPrefix) && key.length() > Attributes.dataPrefix.length();
     }
 

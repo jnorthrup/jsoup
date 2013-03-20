@@ -20,7 +20,7 @@ import java.util.Map;
  @author Jonathan Hedley, jonathan@hedley.net */
 @Ignore // ignored by default so tests don't require network access. comment out to enable.
 public class UrlConnectTest {
-    private static String echoURL = "http://direct.infohound.net/tools/q.pl";
+    private static final String echoURL = "http://direct.infohound.net/tools/q.pl";
 
     @Test
     public void fetchURl() throws IOException {
@@ -36,7 +36,7 @@ public class UrlConnectTest {
 
         assertEquals("GBK", doc.outputSettings().charset().displayName());
         assertEquals("GBK", res.charset());
-        assert(res.hasCookie("BAIDUID"));
+        assert res.hasCookie("BAIDUID");
         assertEquals("text/html;charset=gbk", res.contentType());
     }
     
@@ -200,7 +200,7 @@ public class UrlConnectTest {
         Connection con = Jsoup.connect("http://direct.infohound.net/tools/302-cookie.pl");
         Connection.Response res = con.execute();
 
-        // test cookies set by redirect:
+        // org.jsoup.test cookies set by redirect:
         Map<String, String> cookies = res.cookies();
         assertEquals("asdfg123", cookies.get("token"));
         assertEquals("jhy", cookies.get("uid"));
@@ -216,7 +216,7 @@ public class UrlConnectTest {
         String url = "http://direct.infohound.net/tools/bad-charset.pl";
         Connection.Response res = Jsoup.connect(url).execute();
         assertEquals("text/html; charset=UFT8", res.header("Content-Type")); // from the header
-        assertEquals(null, res.charset()); // tried to get from header, not supported, so returns null
+        assertNull(res.charset()); // tried to get from header, not supported, so returns null
         Document doc = res.parse(); // would throw an error if charset unsupported
         assertTrue(doc.text().contains("Hello!"));
         assertEquals("UTF-8", res.charset()); // set from default on parse

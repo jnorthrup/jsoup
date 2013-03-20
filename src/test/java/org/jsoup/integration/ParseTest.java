@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
- * Integration test: parses from real-world example HTML.
+ * Integration org.jsoup.test: parses from real-world example HTML.
  *
  * @author Jonathan Hedley, jonathan@hedley.net
  */
@@ -89,11 +89,11 @@ public class ParseTest {
         // tests <meta http-equiv="Content-Type" content="text/html;charset=gb2312">
         File in = getFile("/htmltests/baidu-cn-home.html");
         Document doc = Jsoup.parse(in, null,
-            "http://www.baidu.com/"); // http charset is gb2312, but NOT specifying it, to test http-equiv parse
+            "http://www.baidu.com/"); // http charset is gb2312, but NOT specifying it, to org.jsoup.test http-equiv parse
         Element submit = doc.select("#su").first();
         assertEquals("百度一下", submit.attr("value"));
 
-        // test from attribute match
+        // org.jsoup.test from attribute match
         submit = doc.select("input[value=百度一下]").first();
         assertEquals("su", submit.id());
         Element newsLink = doc.select("a:contains(新)").first();
@@ -113,7 +113,7 @@ public class ParseTest {
         // tests <meta charset> when preceded by another <meta>
         File in = getFile("/htmltests/baidu-variant.html");
         Document doc = Jsoup.parse(in, null,
-            "http://www.baidu.com/"); // http charset is gb2312, but NOT specifying it, to test http-equiv parse
+            "http://www.baidu.com/"); // http charset is gb2312, but NOT specifying it, to org.jsoup.test http-equiv parse
         // check auto-detect from meta
         assertEquals("GB2312", doc.outputSettings().charset().displayName());
         assertEquals("<title>百度一下，你就知道</title>", doc.select("title").outerHtml());
@@ -121,7 +121,7 @@ public class ParseTest {
 
     @Test
     public void testHtml5Charset() throws IOException {
-        // test that <meta charset="gb2312"> works
+        // org.jsoup.test that <meta charset="gb2312"> works
         File in = getFile("/htmltests/meta-charset-1.html");
         Document doc = Jsoup.parse(in, null, "http://example.com/"); //gb2312, has html5 <meta charset>
         assertEquals("新", doc.text());
@@ -158,7 +158,7 @@ public class ParseTest {
         assertEquals("In July, GM said its electric Chevrolet Volt will be sold in the United States at $41,000 -- $8,000 more than its nearest competitor, the Nissan Leaf.", p.text());
     }
 
-    File getFile(String resourceName) {
+    private static File getFile(String resourceName) {
         try {
             File file = new File(ParseTest.class.getResource(resourceName).toURI());
             return file;

@@ -12,13 +12,13 @@ class CharacterReader {
 
     private final char[] input;
     private final int length;
-    private int pos = 0;
-    private int mark = 0;
+    private int pos;
+    private int mark;
 
     CharacterReader(String input) {
         Validate.notNull(input);
         this.input = input.toCharArray();
-        this.length = this.input.length;
+        length = this.input.length;
     }
 
     int pos() {
@@ -55,9 +55,13 @@ class CharacterReader {
         pos = mark;
     }
 
-    String consumeAsString() {
-        return new String(input, pos++, 1);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    String consumeAsString() {
+//        String result = new String(input, pos, 1);
+//        pos++;
+//        return result;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Returns the number of characters between the current position and the next instance of the input char
@@ -82,7 +86,8 @@ class CharacterReader {
     int nextIndexOf(CharSequence seq) {
         // doesn't handle scanning for surrogates
         char startChar = seq.charAt(0);
-        for (int offset = pos; offset < length; offset++) {
+        int offset = pos;
+        while (offset < length) {
             // scan to first instance of startchar:
             if (startChar != input[offset])
                 while(++offset < length && startChar != input[offset]);
@@ -93,44 +98,47 @@ class CharacterReader {
                 if (i == last) // found full sequence
                     return offset - pos;
             }
+            offset++;
         }
         return -1;
     }
 
     String consumeTo(char c) {
         int offset = nextIndexOf(c);
-        if (offset != -1) {
+        if (offset == -1) {
+            return consumeToEnd();
+        } else {
             String consumed = new String(input, pos, offset);
             pos += offset;
             return consumed;
-        } else {
-            return consumeToEnd();
         }
     }
 
-    String consumeTo(String seq) {
+    String consumeTo(CharSequence seq) {
         int offset = nextIndexOf(seq);
-        if (offset != -1) {
+        if (offset == -1) {
+            return consumeToEnd();
+        } else {
             String consumed = new String(input, pos, offset);
             pos += offset;
             return consumed;
-        } else {
-            return consumeToEnd();
         }
     }
 
-    String consumeToAny(final char... chars) {
-        int start = pos;
+    String consumeToAny(char... chars) {
 
-        OUTER: while (pos < length) {
-            for (int i = 0; i < chars.length; i++) {
-                if (input[pos] == chars[i])
+
+        int start;
+        OUTER:
+        for (start = pos; pos < length; pos++) {
+            for (char aChar : chars) {
+                if (input[pos] == aChar)
                     break OUTER;
             }
-            pos++;
+
         }
 
-        return pos > start ? new String(input, start, pos-start) : "";
+        return pos > start ? new String(input, start, pos - start) : "";
     }
 
     String consumeToEnd() {
@@ -143,7 +151,7 @@ class CharacterReader {
         int start = pos;
         while (pos < length) {
             char c = input[pos];
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
                 pos++;
             else
                 break;
@@ -156,7 +164,7 @@ class CharacterReader {
         int start = pos;
         while (pos < length) {
             char c = input[pos];
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
                 pos++;
             else
                 break;
@@ -176,7 +184,7 @@ class CharacterReader {
         int start = pos;
         while (pos < length) {
             char c = input[pos];
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
+            if (c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f')
                 pos++;
             else
                 break;
@@ -201,7 +209,7 @@ class CharacterReader {
 
     }
 
-    boolean matches(String seq) {
+    boolean matches(CharSequence seq) {
         int scanLength = seq.length();
         if (scanLength > length - pos)
             return false;
@@ -212,7 +220,7 @@ class CharacterReader {
         return true;
     }
 
-    boolean matchesIgnoreCase(String seq) {
+    boolean matchesIgnoreCase(CharSequence seq) {
         int scanLength = seq.length();
         if (scanLength > length - pos)
             return false;
@@ -242,14 +250,14 @@ class CharacterReader {
         if (isEmpty())
             return false;
         char c = input[pos];
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+        return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
     }
 
     boolean matchesDigit() {
         if (isEmpty())
             return false;
         char c = input[pos];
-        return (c >= '0' && c <= '9');
+        return c >= '0' && c <= '9';
     }
 
     boolean matchConsume(String seq) {
@@ -274,7 +282,7 @@ class CharacterReader {
         // used to check presence of </title>, </style>. only finds consistent case.
         String loScan = seq.toLowerCase(Locale.ENGLISH);
         String hiScan = seq.toUpperCase(Locale.ENGLISH);
-        return (nextIndexOf(loScan) > -1) || (nextIndexOf(hiScan) > -1);
+        return nextIndexOf(loScan) > -1 || nextIndexOf(hiScan) > -1;
     }
 
     @Override

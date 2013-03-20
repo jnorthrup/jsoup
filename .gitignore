@@ -1,16 +1,15 @@
-.idea/
-jsoup.iml
-jsoup.ipr
-jsoup.iws
-target/
+.idea
+*.iml
+*.ipr
+*.iws
+target
 .classpath
 .project
-.settings/
-<<<<<<< HEAD
+.settings
 *Thrash*
 *.class
-bin/org/jsoup/*.class
-bin/org/jsoup/*/*.class
+*.class
 *Thrash
-bin/*
+bin
 *.DS_Store
+*~

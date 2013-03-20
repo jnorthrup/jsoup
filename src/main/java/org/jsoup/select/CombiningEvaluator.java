@@ -15,8 +15,7 @@ abstract class CombiningEvaluator extends Evaluator {
     final List<Evaluator> evaluators;
 
     CombiningEvaluator() {
-        super();
-        evaluators = new ArrayList<Evaluator>();
+        evaluators = new ArrayList<>();
     }
 
     CombiningEvaluator(Collection<Evaluator> evaluators) {
@@ -25,7 +24,7 @@ abstract class CombiningEvaluator extends Evaluator {
     }
 
     Evaluator rightMostEvaluator() {
-        return evaluators.size() > 0 ? evaluators.get(evaluators.size() - 1) : null;
+        return evaluators.isEmpty() ? null : evaluators.get(evaluators.size() - 1);
     }
     
     void replaceRightMostEvaluator(Evaluator replacement) {
@@ -43,8 +42,7 @@ abstract class CombiningEvaluator extends Evaluator {
 
         @Override
         public boolean matches(Element root, Element node) {
-            for (int i = 0; i < evaluators.size(); i++) {
-                Evaluator s = evaluators.get(i);
+            for (Evaluator s : evaluators) {
                 if (!s.matches(root, node))
                     return false;
             }
@@ -53,25 +51,25 @@ abstract class CombiningEvaluator extends Evaluator {
 
         @Override
         public String toString() {
-            return StringUtil.join(evaluators, " ");
+            return StringUtil.join(" ", evaluators);
         }
     }
 
     static final class Or extends CombiningEvaluator {
-        /**
-         * Create a new Or evaluator. The initial evaluators are ANDed together and used as the first clause of the OR.
-         * @param evaluators initial OR clause (these are wrapped into an AND evaluator).
-         */
-        Or(Collection<Evaluator> evaluators) {
-            super();
-            if (evaluators.size() > 1)
-                this.evaluators.add(new And(evaluators));
-            else // 0 or 1
-                this.evaluators.addAll(evaluators);
-        }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//        /**
+//         * Create a new Or evaluator. The initial evaluators are ANDed together and used as the first clause of the OR.
+//         * @param evaluators initial OR clause (these are wrapped into an AND evaluator).
+//         */
+//        Or(Collection<Evaluator> evaluators) {
+//            if (evaluators.size() > 1)
+//                this.evaluators.add(new CombiningEvaluator.And(evaluators));
+//            else // 0 or 1
+//                this.evaluators.addAll(evaluators);
+//        }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
         Or() {
-            super();
         }
 
         public void add(Evaluator e) {
@@ -80,8 +78,7 @@ abstract class CombiningEvaluator extends Evaluator {
 
         @Override
         public boolean matches(Element root, Element node) {
-            for (int i = 0; i < evaluators.size(); i++) {
-                Evaluator s = evaluators.get(i);
+            for (Evaluator s : evaluators) {
                 if (s.matches(root, node))
                     return true;
             }

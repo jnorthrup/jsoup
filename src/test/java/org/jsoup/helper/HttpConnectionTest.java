@@ -52,7 +52,7 @@ public class HttpConnectionTest {
 
     @Test public void ignoresEmptySetCookies() {
         // prep http response header map
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         headers.put("Set-Cookie", Collections.<String>emptyList());
         HttpConnection.Response res = new HttpConnection.Response();
         res.processResponseHeaders(headers);
@@ -61,8 +61,8 @@ public class HttpConnectionTest {
 
     @Test public void ignoresEmptyCookieNameAndVals() {
         // prep http response header map
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
-        List<String> cookieStrings = new ArrayList<String>();
+        Map<String, List<String>> headers = new HashMap<>();
+        List<String> cookieStrings = new ArrayList<>();
         cookieStrings.add(null);
         cookieStrings.add("");
         cookieStrings.add("one");

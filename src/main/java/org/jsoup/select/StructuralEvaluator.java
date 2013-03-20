@@ -10,18 +10,18 @@ abstract class StructuralEvaluator extends Evaluator {
 
     static class Root extends Evaluator {
         public boolean matches(Element root, Element element) {
-            return root == element;
+            return root.equals(element);
         }
     }
 
     static class Has extends StructuralEvaluator {
-        public Has(Evaluator evaluator) {
+        Has(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
         public boolean matches(Element root, Element element) {
             for (Element e : element.getAllElements()) {
-                if (e != element && evaluator.matches(root, e))
+                if (!e.equals(element) && evaluator.matches(root, e))
                     return true;
             }
             return false;
@@ -33,7 +33,7 @@ abstract class StructuralEvaluator extends Evaluator {
     }
 
     static class Not extends StructuralEvaluator {
-        public Not(Evaluator evaluator) {
+        Not(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
@@ -47,16 +47,16 @@ abstract class StructuralEvaluator extends Evaluator {
     }
 
     static class Parent extends StructuralEvaluator {
-        public Parent(Evaluator evaluator) {
+        Parent(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
         public boolean matches(Element root, Element element) {
-            if (root == element)
+            if (root.equals(element))
                 return false;
 
             Element parent = element.parent();
-            while (parent != root) {
+            while (!parent.equals(root)) {
                 if (evaluator.matches(root, parent))
                     return true;
                 parent = parent.parent();
@@ -70,12 +70,12 @@ abstract class StructuralEvaluator extends Evaluator {
     }
 
     static class ImmediateParent extends StructuralEvaluator {
-        public ImmediateParent(Evaluator evaluator) {
+        ImmediateParent(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
         public boolean matches(Element root, Element element) {
-            if (root == element)
+            if (root.equals(element))
                 return false;
 
             Element parent = element.parent();
@@ -88,12 +88,12 @@ abstract class StructuralEvaluator extends Evaluator {
     }
 
     static class PreviousSibling extends StructuralEvaluator {
-        public PreviousSibling(Evaluator evaluator) {
+        PreviousSibling(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
         public boolean matches(Element root, Element element) {
-            if (root == element)
+            if (root.equals(element))
                 return false;
 
             Element prev = element.previousElementSibling();
@@ -113,12 +113,12 @@ abstract class StructuralEvaluator extends Evaluator {
     }
 
     static class ImmediatePreviousSibling extends StructuralEvaluator {
-        public ImmediatePreviousSibling(Evaluator evaluator) {
+        ImmediatePreviousSibling(Evaluator evaluator) {
             this.evaluator = evaluator;
         }
 
         public boolean matches(Element root, Element element) {
-            if (root == element)
+            if (root.equals(element))
                 return false;
 
             Element prev = element.previousElementSibling();

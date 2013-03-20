@@ -12,11 +12,11 @@ import org.jsoup.parser.TokenQueue;
  * Parses a CSS selector into an Evaluator tree.
  */
 class QueryParser {
-    private final static String[] combinators = {",", ">", "+", "~", " "};
+    private static final String[] combinators = {",", ">", "+", "~", " "};
 
     private TokenQueue tq;
     private String query;
-    private List<Evaluator> evals = new ArrayList<Evaluator>();
+    private List<Evaluator> evals = new ArrayList<>();
 
     /**
      * Create a new QueryParser.
@@ -24,7 +24,7 @@ class QueryParser {
      */
     private QueryParser(String query) {
         this.query = query;
-        this.tq = new TokenQueue(query);
+        tq = new TokenQueue(query);
     }
 
     /**
@@ -126,9 +126,9 @@ class QueryParser {
         StringBuilder sq = new StringBuilder();
         while (!tq.isEmpty()) {
             if (tq.matches("("))
-                sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+                sq.append('(').append(tq.chompBalanced('(', ')')).append(')');
             else if (tq.matches("["))
-                sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+                sq.append('[').append(tq.chompBalanced('[', ']')).append(']');
             else if (tq.matchesAny(combinators))
                 break;
             else
@@ -201,7 +201,7 @@ class QueryParser {
         cq.consumeWhitespace();
 
         if (cq.isEmpty()) {
-            if (key.startsWith("^"))
+            if (!key.isEmpty() && key.charAt(0) == '^')
                 evals.add(new Evaluator.AttributeStarting(key.substring(1)));
             else
                 evals.add(new Evaluator.Attribute(key));

@@ -1,7 +1,8 @@
 package org.jsoup.helper;
 
-import java.util.Collection;
 import java.util.Iterator;
+
+import static java.util.Arrays.asList;
 
 /**
  * A minimal String utility class. Designed for internal jsoup use only.
@@ -10,23 +11,31 @@ public final class StringUtil {
     // memoised padding up to 10
     private static final String[] padding = {"", " ", "  ", "   ", "    ", "     ", "      ", "       ", "        ", "         ", "          "};
 
-    /**
-     * Join a collection of strings by a seperator
-     * @param strings collection of string objects
-     * @param sep string to place between strings
-     * @return joined string
-     */
-    public static String join(Collection strings, String sep) {
-        return join(strings.iterator(), sep);
+    private StringUtil() {
+    }
+    public static String join(String sep, String... strings) {
+        return join(sep, asList(strings).iterator());
     }
 
     /**
      * Join a collection of strings by a seperator
-     * @param strings iterator of string objects
+     *
      * @param sep string to place between strings
+     * @param strings collection of string objects
      * @return joined string
      */
-    public static String join(Iterator strings, String sep) {
+    public static String join(String sep, Iterable strings) {
+        return join(sep, strings.iterator());
+    }
+
+    /**
+     * Join a collection of strings by a seperator
+     *
+     * @param sep string to place between strings
+     * @param strings iterator of string objects
+     * @return joined string
+     */
+    private static String join(String sep, Iterator strings) {
         if (!strings.hasNext())
             return "";
 
@@ -62,16 +71,16 @@ public final class StringUtil {
 
     /**
      * Tests if a string is blank: null, emtpy, or only whitespace (" ", \r\n, \t, etc)
-     * @param string string to test
+     * @param string string to org.jsoup.test
      * @return if string is blank
      */
     public static boolean isBlank(String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             return true;
 
         int l = string.length();
         for (int i = 0; i < l; i++) {
-            if (!StringUtil.isWhitespace(string.codePointAt(i)))
+            if (!isWhitespace(string.codePointAt(i)))
                 return false;
         }
         return true;
@@ -79,11 +88,11 @@ public final class StringUtil {
 
     /**
      * Tests if a string is numeric, i.e. contains only digit characters
-     * @param string string to test
+     * @param string string to org.jsoup.test
      * @return true if only digit chars, false if empty or null or contains non-digit chrs
      */
     public static boolean isNumeric(String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             return false;
 
         int l = string.length();
@@ -96,7 +105,7 @@ public final class StringUtil {
 
     /**
      * Tests if a code point is "whitespace" as defined in the HTML spec.
-     * @param c code point to test
+     * @param c code point to org.jsoup.test
      * @return true if code point is whitespace, false otherwise
      */
     public static boolean isWhitespace(int c){
@@ -129,13 +138,5 @@ public final class StringUtil {
             }
         }
         return modified ? sb.toString() : string;
-    }
-
-    public static boolean in(String needle, String... haystack) {
-        for (String hay : haystack) {
-            if (hay.equals(needle))
-            return true;
-        }
-        return false;
     }
 }

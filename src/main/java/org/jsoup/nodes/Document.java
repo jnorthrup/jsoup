@@ -1,5 +1,6 @@
 package org.jsoup.nodes;
 
+import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.helper.Validate;
 import org.jsoup.parser.Tag;
@@ -8,6 +9,7 @@ import org.jsoup.select.Elements;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,13 +17,13 @@ import java.util.List;
 
  @author Jonathan Hedley, jonathan@hedley.net */
 public class Document extends Element {
-    private OutputSettings outputSettings = new OutputSettings();
-    private QuirksMode quirksMode = QuirksMode.noQuirks;
+    private Document.OutputSettings outputSettings = new Document.OutputSettings();
+    private Document.QuirksMode quirksMode = Document.QuirksMode.noQuirks;
 
     /**
      Create a new, empty Document.
      @param baseUri base URI of document
-     @see org.jsoup.Jsoup#parse
+     @see Jsoup#parse
      @see #createShell
      */
     public Document(String baseUri) {
@@ -33,7 +35,7 @@ public class Document extends Element {
      @param baseUri baseUri of document
      @return document with html, head, and body elements.
      */
-    static public Document createShell(String baseUri) {
+    public static Document createShell(String baseUri) {
         Validate.notNull(baseUri);
 
         Document doc = new Document(baseUri);
@@ -91,38 +93,40 @@ public class Document extends Element {
      @return new element
      */
     public Element createElement(String tagName) {
-        return new Element(Tag.valueOf(tagName), this.baseUri());
+        return new Element(Tag.valueOf(tagName), baseUri());
     }
 
-    /**
-     Normalise the document. This happens after the parse phase so generally does not need to be called.
-     Moves any text content that is not in the body element into the body.
-     @return this document after normalisation
-     */
-    public Document normalise() {
-        Element htmlEl = findFirstElementByTagName("html", this);
-        if (htmlEl == null)
-            htmlEl = appendElement("html");
-        if (head() == null)
-            htmlEl.prependElement("head");
-        if (body() == null)
-            htmlEl.appendElement("body");
-
-        // pull text nodes out of root, html, and head els, and push into body. non-text nodes are already taken care
-        // of. do in inverse order to maintain text order.
-        normaliseTextNodes(head());
-        normaliseTextNodes(htmlEl);
-        normaliseTextNodes(this);
-
-        normaliseStructure("head", htmlEl);
-        normaliseStructure("body", htmlEl);
-        
-        return this;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     Normalise the document. This happens after the parse phase so generally does not need to be called.
+//     Moves any text content that is not in the body element into the body.
+//     @return this document after normalisation
+//     */
+//    public Document normalise() {
+//        Element htmlEl = findFirstElementByTagName("html", this);
+//        if (htmlEl == null)
+//            htmlEl = appendElement("html");
+//        if (head() == null)
+//            htmlEl.prependElement("head");
+//        if (body() == null)
+//            htmlEl.appendElement("body");
+//
+//        // pull text nodes out of root, html, and head els, and push into body. non-text nodes are already taken care
+//        // of. do in inverse order to maintain text order.
+//        normaliseTextNodes(head());
+//        normaliseTextNodes(htmlEl);
+//        normaliseTextNodes(this);
+//
+//        normaliseStructure("head", htmlEl);
+//        normaliseStructure("body", htmlEl);
+//        
+//        return this;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     // does not recurse.
     private void normaliseTextNodes(Element element) {
-        List<Node> toMove = new ArrayList<Node>();
+        List<Node> toMove = new ArrayList<>();
         for (Node node: element.childNodes) {
             if (node instanceof TextNode) {
                 TextNode tn = (TextNode) node;
@@ -141,10 +145,10 @@ public class Document extends Element {
 
     // merge multiple <head> or <body> contents into one, delete the remainder, and ensure they are owned by <html>
     private void normaliseStructure(String tag, Element htmlEl) {
-        Elements elements = this.getElementsByTag(tag);
+        Elements elements = getElementsByTag(tag);
         Element master = elements.first(); // will always be available as created above if not existent
         if (elements.size() > 1) { // dupes, move contents to master
-            List<Node> toMove = new ArrayList<Node>();
+            Collection<Node> toMove = new ArrayList<>();
             for (int i = 1; i < elements.size(); i++) {
                 Node dupe = elements.get(i);
                 for (Node node : dupe.childNodes)
@@ -162,22 +166,20 @@ public class Document extends Element {
     }
 
     // fast method to get first by tag name, used for html, head, body finders
-    private Element findFirstElementByTagName(String tag, Node node) {
+    private static Element findFirstElementByTagName(String tag, Node node) {
         if (node.nodeName().equals(tag))
             return (Element) node;
-        else {
-            for (Node child: node.childNodes) {
-                Element found = findFirstElementByTagName(tag, child);
-                if (found != null)
-                    return found;
-            }
+        for (Node child: node.childNodes) {
+            Element found = findFirstElementByTagName(tag, child);
+            if (found != null)
+                return found;
         }
         return null;
     }
 
     @Override
     public String outerHtml() {
-        return super.html(); // no outer wrapper tag
+        return html(); // no outer wrapper tag
     }
 
     /**
@@ -199,7 +201,7 @@ public class Document extends Element {
     @Override
     public Document clone() {
         Document clone = (Document) super.clone();
-        clone.outputSettings = this.outputSettings.clone();
+        clone.outputSettings = outputSettings.clone();
         return clone;
     }
 
@@ -207,13 +209,11 @@ public class Document extends Element {
      * A Document's output settings control the form of the text() and html() methods.
      */
     public static class OutputSettings implements Cloneable {
-        private Entities.EscapeMode escapeMode = Entities.EscapeMode.base;
+        private Entities.EscapeMode escapeMode = Entities.EscapeMode.defaultHtml;
         private Charset charset = Charset.forName("UTF-8");
         private CharsetEncoder charsetEncoder = charset.newEncoder();
         private boolean prettyPrint = true;
         private int indentAmount = 1;
-
-        public OutputSettings() {}
 
         /**
          * Get the document's current HTML escape mode: <code>base</code>, which provides a limited set of named HTML
@@ -232,7 +232,7 @@ public class Document extends Element {
          * @param escapeMode the new escape mode to use
          * @return the document's output settings, for chaining
          */
-        public OutputSettings escapeMode(Entities.EscapeMode escapeMode) {
+        public Document.OutputSettings escapeMode(Entities.EscapeMode escapeMode) {
             this.escapeMode = escapeMode;
             return this;
         }
@@ -254,7 +254,7 @@ public class Document extends Element {
          * @param charset the new charset to use.
          * @return the document's output settings, for chaining
          */
-        public OutputSettings charset(Charset charset) {
+        public Document.OutputSettings charset(Charset charset) {
             // todo: this should probably update the doc's meta charset
             this.charset = charset;
             charsetEncoder = charset.newEncoder();
@@ -266,7 +266,7 @@ public class Document extends Element {
          * @param charset the new charset (by name) to use.
          * @return the document's output settings, for chaining
          */
-        public OutputSettings charset(String charset) {
+        public Document.OutputSettings charset(String charset) {
             charset(Charset.forName(charset));
             return this;
         }
@@ -289,7 +289,7 @@ public class Document extends Element {
          * @param pretty new pretty print setting
          * @return this, for chaining
          */
-        public OutputSettings prettyPrint(boolean pretty) {
+        public Document.OutputSettings prettyPrint(boolean pretty) {
             prettyPrint = pretty;
             return this;
         }
@@ -307,17 +307,17 @@ public class Document extends Element {
          * @param indentAmount number of spaces to use for indenting each level. Must be >= 0.
          * @return this, for chaining
          */
-        public OutputSettings indentAmount(int indentAmount) {
+        public Document.OutputSettings indentAmount(int indentAmount) {
             Validate.isTrue(indentAmount >= 0);
             this.indentAmount = indentAmount;
             return this;
         }
 
         @Override
-        public OutputSettings clone() {
-            OutputSettings clone;
+        public Document.OutputSettings clone() {
+            Document.OutputSettings clone;
             try {
-                clone = (OutputSettings) super.clone();
+                clone = (Document.OutputSettings) super.clone();
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -332,7 +332,7 @@ public class Document extends Element {
      * Get the document's current output settings.
      * @return the document's current output settings.
      */
-    public OutputSettings outputSettings() {
+    public Document.OutputSettings outputSettings() {
         return outputSettings;
     }
 
@@ -341,21 +341,21 @@ public class Document extends Element {
      * @param outputSettings new output settings.
      * @return this document, for chaining.
      */
-    public Document outputSettings(OutputSettings outputSettings) {
+    public Document outputSettings(Document.OutputSettings outputSettings) {
         Validate.notNull(outputSettings);
         this.outputSettings = outputSettings;
         return this;
     }
 
     public enum QuirksMode {
-        noQuirks, quirks, limitedQuirks;
+        noQuirks, quirks, // --Commented out by Inspection (3/20/13 10:02 AM):limitedQuirks
     }
 
-    public QuirksMode quirksMode() {
+    public Document.QuirksMode quirksMode() {
         return quirksMode;
     }
 
-    public Document quirksMode(QuirksMode quirksMode) {
+    public Document quirksMode(Document.QuirksMode quirksMode) {
         this.quirksMode = quirksMode;
         return this;
     }

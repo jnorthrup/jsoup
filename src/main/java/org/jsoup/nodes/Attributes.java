@@ -15,9 +15,9 @@ import java.util.*;
  * @author Jonathan Hedley, jonathan@hedley.net
  */
 public class Attributes implements Iterable<Attribute>, Cloneable {
-    protected static final String dataPrefix = "data-";
+    static final String dataPrefix = "data-";
     
-    private LinkedHashMap<String, Attribute> attributes = null;
+    private LinkedHashMap<String, Attribute> attributes;
     // linked hash map to preserve insertion order.
     // null be default as so many elements have no attributes -- saves a good chunk of memory
 
@@ -54,7 +54,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
     public void put(Attribute attribute) {
         Validate.notNull(attribute);
         if (attributes == null)
-             attributes = new LinkedHashMap<String, Attribute>(2);
+             attributes = new LinkedHashMap<>(2);
         attributes.put(attribute.getKey(), attribute);
     }
 
@@ -96,7 +96,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         if (incoming.size() == 0)
             return;
         if (attributes == null)
-            attributes = new LinkedHashMap<String, Attribute>(incoming.size());
+            attributes = new LinkedHashMap<>(incoming.size());
         attributes.putAll(incoming.attributes);
     }
     
@@ -113,7 +113,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         if (attributes == null)
             return Collections.emptyList();
 
-        List<Attribute> list = new ArrayList<Attribute>(attributes.size());
+        List<Attribute> list = new ArrayList<>(attributes.size());
         for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
             list.add(entry.getValue());
         }
@@ -126,7 +126,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
      * @return map of custom data attributes.
      */
     public Map<String, String> dataset() {
-        return new Dataset();
+        return new Attributes.Dataset();
     }
 
     /**
@@ -135,7 +135,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
      */
     public String html() {
         StringBuilder accum = new StringBuilder();
-        html(accum, (new Document("")).outputSettings()); // output settings a bit funky, but this html() seldom used
+        html(accum, new Document("").outputSettings()); // output settings a bit funky, but this html() seldom used
         return accum.toString();
     }
     
@@ -145,7 +145,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         
         for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
             Attribute attribute = entry.getValue();
-            accum.append(" ");
+            accum.append(' ');
             attribute.html(accum, out);
         }
     }
@@ -182,7 +182,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
-        clone.attributes = new LinkedHashMap<String, Attribute>(attributes.size());
+        clone.attributes = new LinkedHashMap<>(attributes.size());
         for (Attribute attribute: this)
             clone.attributes.put(attribute.getKey(), attribute.clone());
         return clone;
@@ -190,13 +190,13 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
 
     private class Dataset extends AbstractMap<String, String> {
 
-        private Dataset() {
+        Dataset() {
             if (attributes == null)
-                attributes = new LinkedHashMap<String, Attribute>(2);
+                attributes = new LinkedHashMap<>(2);
         }
 
-        public Set<Entry<String, String>> entrySet() {
-            return new EntrySet();
+        public Set<Map.Entry<String, String>> entrySet() {
+            return new Attributes.Dataset.EntrySet();
         }
 
         @Override
@@ -209,13 +209,16 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         }
 
         private class EntrySet extends AbstractSet<Map.Entry<String, String>> {
+            EntrySet() {
+            }
+
             public Iterator<Map.Entry<String, String>> iterator() {
-                return new DatasetIterator();
+                return new Attributes.Dataset.DatasetIterator();
             }
 
             public int size() {
                 int count = 0;
-                Iterator iter = new DatasetIterator();
+                Iterator iter = new Attributes.Dataset.DatasetIterator();
                 while (iter.hasNext())
                     count++;
                 return count;
@@ -225,6 +228,10 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
         private class DatasetIterator implements Iterator<Map.Entry<String, String>> {
             private Iterator<Attribute> attrIter = attributes.values().iterator();
             private Attribute attr;
+
+            DatasetIterator() {
+            }
+
             public boolean hasNext() {
                 while (attrIter.hasNext()) {
                     attr = attrIter.next();
@@ -233,7 +240,7 @@ public class Attributes implements Iterable<Attribute>, Cloneable {
                 return false;
             }
 
-            public Entry<String, String> next() {
+            public Map.Entry<String, String> next() {
                 return new Attribute(attr.getKey().substring(dataPrefix.length()), attr.getValue());
             }
 

@@ -10,7 +10,7 @@ import org.jsoup.helper.Validate;
  */
 public class TokenQueue {
     private String queue;
-    private int pos = 0;
+    private int pos;
     
     private static final char ESC = '\\'; // escape char for chomp balanced.
 
@@ -35,21 +35,25 @@ public class TokenQueue {
         return queue.length() - pos;
     }
 
-    /**
-     * Retrieves but does not remove the first character from the queue.
-     * @return First character, or 0 if empty.
-     */
-    public char peek() {
-        return isEmpty() ? 0 : queue.charAt(pos);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Retrieves but does not remove the first character from the queue.
+//     * @return First character, or 0 if empty.
+//     */
+//    public char peek() {
+//        return isEmpty() ? 0 : queue.charAt(pos);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     Add a character to the start of the queue (will be the next character retrieved).
-     @param c character to add
-     */
-    public void addFirst(Character c) {
-        addFirst(c.toString());
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     Add a character to the start of the queue (will be the next character retrieved).
+//     @param c character to add
+//     */
+//    public void addFirst(Character c) {
+//        addFirst(c.toString());
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      Add a string to the start of the queue.
@@ -70,14 +74,16 @@ public class TokenQueue {
         return queue.regionMatches(true, pos, seq, 0, seq.length());
     }
 
-    /**
-     * Case sensitive match test.
-     * @param seq string to case sensitively check for
-     * @return true if matched, false if not
-     */
-    public boolean matchesCS(String seq) {
-        return queue.startsWith(seq, pos);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Case sensitive match org.jsoup.test.
+//     * @param seq string to case sensitively check for
+//     * @return true if matched, false if not
+//     */
+//    public boolean matchesCS(String seq) {
+//        return queue.startsWith(seq, pos);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
 
     /**
@@ -93,7 +99,7 @@ public class TokenQueue {
         return false;
     }
 
-    public boolean matchesAny(char... seq) {
+    boolean matchesAny(char... seq) {
         if (isEmpty())
             return false;
 
@@ -104,10 +110,12 @@ public class TokenQueue {
         return false;
     }
 
-    public boolean matchesStartTag() {
-        // micro opt for matching "<x"
-        return (remainingLength() >= 2 && queue.charAt(pos) == '<' && Character.isLetter(queue.charAt(pos+1)));
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    public boolean matchesStartTag() {
+//        // micro opt for matching "<x"
+//        return remainingLength() >= 2 && queue.charAt(pos) == '<' && Character.isLetter(queue.charAt(pos+1));
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Tests if the queue matches the sequence (as with match), and if they do, removes the matched string from the
@@ -128,7 +136,7 @@ public class TokenQueue {
      Tests if queue starts with a whitespace character.
      @return if starts with whitespace
      */
-    public boolean matchesWhitespace() {
+    boolean matchesWhitespace() {
         return !isEmpty() && StringUtil.isWhitespace(queue.charAt(pos));
     }
 
@@ -140,19 +148,23 @@ public class TokenQueue {
         return !isEmpty() && Character.isLetterOrDigit(queue.charAt(pos));
     }
 
-    /**
-     * Drops the next character off the queue.
-     */
-    public void advance() {
-        if (!isEmpty()) pos++;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Drops the next character off the queue.
+//     */
+//    public void advance() {
+//        if (!isEmpty()) pos++;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Consume one character off queue.
      * @return first character on queue.
      */
     public char consume() {
-        return queue.charAt(pos++);
+        char result = queue.charAt(pos);
+        pos++;
+        return result;
     }
 
     /**
@@ -179,16 +191,16 @@ public class TokenQueue {
      */
     public String consumeTo(String seq) {
         int offset = queue.indexOf(seq, pos);
-        if (offset != -1) {
+        if (offset == -1) {
+            return remainder();
+        } else {
             String consumed = queue.substring(pos, offset);
             pos += consumed.length();
             return consumed;
-        } else {
-            return remainder();
         }
     }
     
-    public String consumeToIgnoreCase(String seq) {
+    String consumeToIgnoreCase(String seq) {
         int start = pos;
         String first = seq.substring(0, 1);
         boolean canScan = first.toLowerCase().equals(first.toUpperCase()); // if first is not cased, use index of
@@ -324,18 +336,20 @@ public class TokenQueue {
         return queue.substring(start, pos);
     }
     
-    /**
-     * Consume an tag name off the queue (word or :, _, -)
-     * 
-     * @return tag name
-     */
-    public String consumeTagName() {
-        int start = pos;
-        while (!isEmpty() && (matchesWord() || matchesAny(':', '_', '-')))
-            pos++;
-        
-        return queue.substring(start, pos);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Consume an tag name off the queue (word or :, _, -)
+//     * 
+//     * @return tag name
+//     */
+//    public String consumeTagName() {
+//        int start = pos;
+//        while (!isEmpty() && (matchesWord() || matchesAny(':', '_', '-')))
+//            pos++;
+//        
+//        return queue.substring(start, pos);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     /**
      * Consume a CSS element selector (tag name, but | instead of : for namespaces, to not conflict with :pseudo selects).
@@ -363,17 +377,19 @@ public class TokenQueue {
         return queue.substring(start, pos);
     }
 
-    /**
-     Consume an attribute key off the queue (letter, digit, -, _, :")
-     @return attribute key
-     */
-    public String consumeAttributeKey() {
-        int start = pos;
-        while (!isEmpty() && (matchesWord() || matchesAny('-', '_', ':')))
-            pos++;
-        
-        return queue.substring(start, pos);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     Consume an attribute key off the queue (letter, digit, -, _, :")
+//     @return attribute key
+//     */
+//    public String consumeAttributeKey() {
+//        int start = pos;
+//        while (!isEmpty() && (matchesWord() || matchesAny('-', '_', ':')))
+//            pos++;
+//        
+//        return queue.substring(start, pos);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      Consume and return whatever is left on the queue.

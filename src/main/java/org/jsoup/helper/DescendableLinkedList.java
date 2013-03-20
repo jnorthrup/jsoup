@@ -10,13 +10,6 @@ import java.util.ListIterator;
 public class DescendableLinkedList<E> extends LinkedList<E> {
 
     /**
-     * Create a new DescendableLinkedList.
-     */
-    public DescendableLinkedList() {
-        super();
-    }
-
-    /**
      * Add a new element to the start of the list.
      * @param e element to add
      */
@@ -45,14 +38,13 @@ public class DescendableLinkedList<E> extends LinkedList<E> {
      * @return an iterator that starts and the end of the list and works towards the start.
      */
     public Iterator<E> descendingIterator() {
-        return new DescendingIterator<E>(size());
+        return new DescendingIterator<E> (size());
     }
 
     private class DescendingIterator<E> implements Iterator<E> {
         private final ListIterator<E> iter;
 
-        @SuppressWarnings("unchecked")
-        private DescendingIterator(int index) {
+         DescendingIterator(int index) {
             iter = (ListIterator<E>) listIterator(index);
         }
 

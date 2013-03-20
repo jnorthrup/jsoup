@@ -28,16 +28,16 @@ public class XmlDeclaration extends Node {
      Get the unencoded XML declaration.
      @return XML declaration
      */
-    public String getWholeDeclaration() {
+    String getWholeDeclaration() {
         return attributes.get(DECL_KEY);
     }
 
     void outerHtmlHead(StringBuilder accum, int depth, Document.OutputSettings out) {
         accum
-                .append("<")
+                .append('<')
                 .append(isProcessingInstruction ? "!" : "?")
                 .append(getWholeDeclaration())
-                .append(">");
+                .append('>');
     }
 
     void outerHtmlTail(StringBuilder accum, int depth, Document.OutputSettings out) {}

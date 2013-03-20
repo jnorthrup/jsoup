@@ -66,9 +66,9 @@ public class XmlTreeBuilder extends TreeBuilder {
         Node insert = comment;
         if (commentToken.bogus) { // xml declarations are emitted as bogus comments (which is right for html, but not xml)
             String data = comment.getData();
-            if (data.length() > 1 && (data.startsWith("!") || data.startsWith("?"))) {
+            if (data.length() > 1 && (!data.isEmpty() && data.charAt(0) == '!' || !data.isEmpty() && data.charAt(0) == '?')) {
                 String declaration = data.substring(1);
-                insert = new XmlDeclaration(declaration, comment.baseUri(), data.startsWith("!"));
+                insert = new XmlDeclaration(declaration, comment.baseUri(), !data.isEmpty() && data.charAt(0) == '!');
             }
         }
         insertNode(insert);
@@ -108,7 +108,7 @@ public class XmlTreeBuilder extends TreeBuilder {
         it = stack.descendingIterator();
         while (it.hasNext()) {
             Element next = it.next();
-            if (next == firstFound) {
+            if (next.equals(firstFound)) {
                 it.remove();
                 break;
             } else {

@@ -54,7 +54,7 @@ public class TextNodeTest {
         assertEquals("there", tail.getWholeText());
         tail.text("there!");
         assertEquals("Hello there!", div.text());
-        assertTrue(tn.parent() == tail.parent());
+        assertSame(tn.parent(), tail.parent());
     }
 
     @Test public void testSplitAnEmbolden() {

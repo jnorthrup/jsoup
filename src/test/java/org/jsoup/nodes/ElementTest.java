@@ -9,10 +9,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Tests for Element (DOM stuff mostly).
@@ -131,9 +128,9 @@ public class ElementTest {
     @Test public void testElementSiblingIndex() {
         Document doc = Jsoup.parse("<div><p>One</p>...<p>Two</p>...<p>Three</p>");
         Elements ps = doc.select("p");
-        assertTrue(0 == ps.get(0).elementSiblingIndex());
-        assertTrue(1 == ps.get(1).elementSiblingIndex());
-        assertTrue(2 == ps.get(2).elementSiblingIndex());
+        assertEquals((Integer)0,(Integer)ps.get(0).elementSiblingIndex());
+        assertEquals((Integer)1,(Integer)ps.get(1).elementSiblingIndex());
+        assertEquals((Integer)2,(Integer)ps.get(2).elementSiblingIndex());
     }
 
     @Test public void testGetElementsWithClass() {
@@ -222,8 +219,8 @@ public class ElementTest {
     }
 
     @Test public void testFormatHtml() {
-        Document doc = Jsoup.parse("<title>Format test</title><div><p>Hello <span>jsoup <span>users</span></span></p><p>Good.</p></div>");
-        assertEquals("<html>\n <head>\n  <title>Format test</title>\n </head>\n <body>\n  <div>\n   <p>Hello <span>jsoup <span>users</span></span></p>\n   <p>Good.</p>\n  </div>\n </body>\n</html>", doc.html());
+        Document doc = Jsoup.parse("<title>Format org.jsoup.test</title><div><p>Hello <span>jsoup <span>users</span></span></p><p>Good.</p></div>");
+        assertEquals("<html>\n <head>\n  <title>Format org.jsoup.test</title>\n </head>\n <body>\n  <div>\n   <p>Hello <span>jsoup <span>users</span></span></p>\n   <p>Good.</p>\n  </div>\n </body>\n</html>", doc.html());
     }
 
     @Test public void testSetIndent() {
@@ -438,7 +435,7 @@ public class ElementTest {
         assertEquals("bacon", dataset.get("food"));
 
         attributes.put("data-", "empty");
-        assertEquals(null, dataset.get("")); // data- is not a data attribute
+        assertNull(dataset.get("")); // data- is not a data attribute
 
         Element p = doc.select("p").first();
         assertEquals(0, p.dataset().size());
@@ -583,7 +580,7 @@ public class ElementTest {
 
     @Test
     public void moveByAppend() {
-        // test for https://github.com/jhy/jsoup/issues/239
+        // org.jsoup.test for https://github.com/jhy/jsoup/issues/239
         // can empty an element and append its children to another element
         Document doc = Jsoup.parse("<div id=1>Text <p>One</p> Text <p>Two</p></div><div id=2></div>");
         Element div1 = doc.select("div").get(0);
@@ -640,7 +637,7 @@ public class ElementTest {
         assertEquals(4, div2.childNodeSize());
         assertEquals(3, p1s.get(1).siblingIndex()); // should be last
 
-        List<Node> els = new ArrayList<Node>();
+        Collection<Node> els = new ArrayList<>();
         Element el1 = new Element(Tag.valueOf("span"), "").text("Span1");
         Element el2 = new Element(Tag.valueOf("span"), "").text("Span2");
         TextNode tn1 = new TextNode("Text4", "");

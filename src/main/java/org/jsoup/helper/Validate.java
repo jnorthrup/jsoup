@@ -9,7 +9,7 @@ public final class Validate {
 
     /**
      * Validates that the object is not null
-     * @param obj object to test
+     * @param obj object to org.jsoup.test
      */
     public static void notNull(Object obj) {
         if (obj == null)
@@ -18,7 +18,7 @@ public final class Validate {
 
     /**
      * Validates that the object is not null
-     * @param obj object to test
+     * @param obj object to org.jsoup.test
      * @param msg message to output if validation fails
      */
     public static void notNull(Object obj, String msg) {
@@ -28,7 +28,7 @@ public final class Validate {
 
     /**
      * Validates that the value is true
-     * @param val object to test
+     * @param val object to org.jsoup.test
      */
     public static void isTrue(boolean val) {
         if (!val)
@@ -37,7 +37,7 @@ public final class Validate {
 
     /**
      * Validates that the value is true
-     * @param val object to test
+     * @param val object to org.jsoup.test
      * @param msg message to output if validation fails
      */
     public static void isTrue(boolean val, String msg) {
@@ -47,7 +47,7 @@ public final class Validate {
 
     /**
      * Validates that the value is false
-     * @param val object to test
+     * @param val object to org.jsoup.test
      */
     public static void isFalse(boolean val) {
         if (val)
@@ -56,7 +56,7 @@ public final class Validate {
 
     /**
      * Validates that the value is false
-     * @param val object to test
+     * @param val object to org.jsoup.test
      * @param msg message to output if validation fails
      */
     public static void isFalse(boolean val, String msg) {
@@ -66,18 +66,18 @@ public final class Validate {
 
     /**
      * Validates that the array contains no null elements
-     * @param objects the array to test
+     * @param objects the array to org.jsoup.test
      */
-    public static void noNullElements(Object[] objects) {
+    public static void noNullElements(Object... objects) {
         noNullElements(objects, "Array must not contain any null objects");
     }
 
     /**
      * Validates that the array contains no null elements
-     * @param objects the array to test
+     * @param objects the array to org.jsoup.test
      * @param msg message to output if validation fails
      */
-    public static void noNullElements(Object[] objects, String msg) {
+    private static void noNullElements(Object[] objects, String msg) {
         for (Object obj : objects)
             if (obj == null)
                 throw new IllegalArgumentException(msg);
@@ -85,20 +85,20 @@ public final class Validate {
 
     /**
      * Validates that the string is not empty
-     * @param string the string to test
+     * @param string the string to org.jsoup.test
      */
     public static void notEmpty(String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             throw new IllegalArgumentException("String must not be empty");
     }
 
     /**
      * Validates that the string is not empty
-     * @param string the string to test
+     * @param string the string to org.jsoup.test
      * @param msg message to output if validation fails
      */
     public static void notEmpty(String string, String msg) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             throw new IllegalArgumentException(msg);
     }
 

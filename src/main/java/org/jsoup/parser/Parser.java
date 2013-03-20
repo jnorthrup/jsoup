@@ -1,5 +1,6 @@
 package org.jsoup.parser;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -7,21 +8,21 @@ import org.jsoup.nodes.Node;
 import java.util.List;
 
 /**
- * Parses HTML into a {@link org.jsoup.nodes.Document}. Generally best to use one of the  more convenient parse methods
- * in {@link org.jsoup.Jsoup}.
+ * Parses HTML into a {@link Document}. Generally best to use one of the  more convenient parse methods
+ * in {@link Jsoup}.
  */
 public class Parser {
-    private static final int DEFAULT_MAX_ERRORS = 0; // by default, error tracking is disabled.
+    // --Commented out by Inspection (3/20/13 10:02 AM):private static final int DEFAULT_MAX_ERRORS = 0; // by default, error tracking is disabled.
     
     private TreeBuilder treeBuilder;
-    private int maxErrors = DEFAULT_MAX_ERRORS;
+    private int maxErrors;
     private ParseErrorList errors;
 
     /**
      * Create a new Parser, using the specified TreeBuilder
      * @param treeBuilder TreeBuilder to use to parse input into Documents.
      */
-    public Parser(TreeBuilder treeBuilder) {
+    private Parser(TreeBuilder treeBuilder) {
         this.treeBuilder = treeBuilder;
     }
     
@@ -32,29 +33,33 @@ public class Parser {
     }
 
     // gets & sets
-    /**
-     * Get the TreeBuilder currently in use.
-     * @return current TreeBuilder.
-     */
-    public TreeBuilder getTreeBuilder() {
-        return treeBuilder;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Get the TreeBuilder currently in use.
+//     * @return current TreeBuilder.
+//     */
+//    public TreeBuilder getTreeBuilder() {
+//        return treeBuilder;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Update the TreeBuilder used when parsing content.
-     * @param treeBuilder current TreeBuilder
-     * @return this, for chaining
-     */
-    public Parser setTreeBuilder(TreeBuilder treeBuilder) {
-        this.treeBuilder = treeBuilder;
-        return this;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Update the TreeBuilder used when parsing content.
+//     * @param treeBuilder current TreeBuilder
+//     * @return this, for chaining
+//     */
+//    public Parser setTreeBuilder(TreeBuilder treeBuilder) {
+//        this.treeBuilder = treeBuilder;
+//        return this;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Check if parse error tracking is enabled.
      * @return current track error state.
      */
-    public boolean isTrackErrors() {
+    boolean isTrackErrors() {
         return maxErrors > 0;
     }
 
@@ -135,16 +140,18 @@ public class Parser {
         return tokeniser.unescapeEntities(inAttribute);
     }
 
-    /**
-     * @param bodyHtml HTML to parse
-     * @param baseUri baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
-     *
-     * @return parsed Document
-     * @deprecated Use {@link #parseBodyFragment} or {@link #parseFragment} instead.
-     */
-    public static Document parseBodyFragmentRelaxed(String bodyHtml, String baseUri) {
-        return parse(bodyHtml, baseUri);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * @param bodyHtml HTML to parse
+//     * @param baseUri baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+//     *
+//     * @return parsed Document
+//     * @deprecated Use {@link #parseBodyFragment} or {@link #parseFragment} instead.
+//     */
+//    public static Document parseBodyFragmentRelaxed(String bodyHtml, String baseUri) {
+//        return parse(bodyHtml, baseUri);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
     
     // builders
 

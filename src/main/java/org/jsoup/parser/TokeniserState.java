@@ -283,7 +283,7 @@ enum TokeniserState {
         }
 
         private void anythingElse(Tokeniser t, CharacterReader r) {
-            t.emit("</" + t.dataBuffer.toString());
+            t.emit("</" + t.dataBuffer);
             r.unconsume();
             t.transition(Rcdata);
         }
@@ -345,7 +345,7 @@ enum TokeniserState {
         }
 
         private void anythingElse(Tokeniser t, CharacterReader r) {
-            t.emit("</" + t.dataBuffer.toString());
+            t.emit("</" + t.dataBuffer);
             t.transition(Rawtext);
         }
     },
@@ -415,7 +415,7 @@ enum TokeniserState {
         }
 
         private void anythingElse(Tokeniser t, CharacterReader r) {
-            t.emit("</" + t.dataBuffer.toString());
+            t.emit("</" + t.dataBuffer);
             t.transition(ScriptData);
         }
     },
@@ -591,7 +591,7 @@ enum TokeniserState {
         }
         
         private void anythingElse(Tokeniser t, CharacterReader r) {
-            t.emit("</" + t.dataBuffer.toString());
+            t.emit("</" + t.dataBuffer);
             t.transition(ScriptDataEscaped);
         }
     },
@@ -613,7 +613,7 @@ enum TokeniserState {
                 case ' ':
                 case '/':
                 case '>':
-                    if (t.dataBuffer.toString().equals("script"))
+                    if ("script".equals(t.dataBuffer.toString()))
                         t.transition(ScriptDataDoubleEscaped);
                     else
                         t.transition(ScriptDataEscaped);
@@ -738,7 +738,7 @@ enum TokeniserState {
                 case ' ':
                 case '/':
                 case '>':
-                    if (t.dataBuffer.toString().equals("script"))
+                    if ("script".equals(t.dataBuffer.toString()))
                         t.transition(ScriptDataEscaped);
                     else
                         t.transition(ScriptDataDoubleEscaped);
@@ -932,7 +932,7 @@ enum TokeniserState {
     AttributeValue_doubleQuoted {
         void read(Tokeniser t, CharacterReader r) {
             String value = r.consumeToAny('"', '&', nullChar);
-            if (value.length() > 0)
+            if (!value.isEmpty())
                 t.tagPending.appendAttributeValue(value);
 
             char c = r.consume();
@@ -962,7 +962,7 @@ enum TokeniserState {
     AttributeValue_singleQuoted {
         void read(Tokeniser t, CharacterReader r) {
             String value = r.consumeToAny('\'', '&', nullChar);
-            if (value.length() > 0)
+            if (!value.isEmpty())
                 t.tagPending.appendAttributeValue(value);
 
             char c = r.consume();
@@ -992,7 +992,7 @@ enum TokeniserState {
     AttributeValue_unquoted {
         void read(Tokeniser t, CharacterReader r) {
             String value = r.consumeToAny('\t', '\n', '\r', '\f', ' ', '&', '>', nullChar, '"', '\'', '<', '=', '`');
-            if (value.length() > 0)
+            if (!value.isEmpty())
                 t.tagPending.appendAttributeValue(value);
 
             char c = r.consume();

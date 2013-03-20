@@ -10,10 +10,10 @@ import java.nio.charset.Charset;
 public class EntitiesTest {
     @Test public void escape() {
         String text = "Hello &<> Å å π 新 there ¾ ©";
-        String escapedAscii = Entities.escape(text, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.base);
-        String escapedAsciiFull = Entities.escape(text, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.extended);
+        String escapedAscii = Entities.escape(text, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.defaultHtml);
+        String escapedAsciiFull = Entities.escape(text, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.extendedHtml);
         String escapedAsciiXhtml = Entities.escape(text, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.xhtml);
-        String escapedUtf = Entities.escape(text, Charset.forName("UTF-8").newEncoder(), Entities.EscapeMode.base);
+        String escapedUtf = Entities.escape(text, Charset.forName("UTF-8").newEncoder(), Entities.EscapeMode.defaultHtml);
 
         assertEquals("Hello &amp;&lt;&gt; &Aring; &aring; &#960; &#26032; there &frac34; &copy;", escapedAscii);
         assertEquals("Hello &amp;&lt;&gt; &angst; &aring; &pi; &#26032; there &frac34; &copy;", escapedAsciiFull);
@@ -39,7 +39,7 @@ public class EntitiesTest {
     
     @Test public void caseSensitive() {
         String unescaped = "Ü ü & &";
-        assertEquals("&Uuml; &uuml; &amp; &amp;", Entities.escape(unescaped, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.extended));
+        assertEquals("&Uuml; &uuml; &amp; &amp;", Entities.escape(unescaped, Charset.forName("ascii").newEncoder(), Entities.EscapeMode.extendedHtml));
         
         String escaped = "&Uuml; &uuml; &amp; &AMP";
         assertEquals("Ü ü & &", Entities.unescape(escaped));

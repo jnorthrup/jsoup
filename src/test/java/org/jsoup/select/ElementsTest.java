@@ -243,11 +243,11 @@ public class ElementsTest {
         final StringBuilder accum = new StringBuilder();
         doc.select("div").traverse(new NodeVisitor() {
             public void head(Node node, int depth) {
-                accum.append("<" + node.nodeName() + ">");
+                accum.append('<').append(node.nodeName()).append('>');
             }
 
             public void tail(Node node, int depth) {
-                accum.append("</" + node.nodeName() + ">");
+                accum.append("</").append(node.nodeName()).append('>');
             }
         });
         assertEquals("<div><p><#text></#text></p></div><div><#text></#text></div>", accum.toString());

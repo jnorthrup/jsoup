@@ -10,13 +10,15 @@ import org.jsoup.helper.HttpConnection;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 /**
  The core public access point to the jsoup functionality.
 
  @author Jonathan Hedley */
-public class Jsoup {
+public final class Jsoup {
     private Jsoup() {}
 
     /**
@@ -103,20 +105,22 @@ public class Jsoup {
         return DataUtil.load(in, charsetName, in.getAbsolutePath());
     }
 
-     /**
-     Read an input stream, and parse it to a Document.
-
-     @param in          input stream to read. Make sure to close it after parsing.
-     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
-     present, or fall back to {@code UTF-8} (which is often safe to do).
-     @param baseUri     The URL where the HTML was retrieved from, to resolve relative links against.
-     @return sane HTML
-
-     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
-     */
-    public static Document parse(InputStream in, String charsetName, String baseUri) throws IOException {
-        return DataUtil.load(in, charsetName, baseUri);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//     /**
+//     Read an input stream, and parse it to a Document.
+//
+//     @param in          input stream to read. Make sure to close it after parsing.
+//     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
+//     present, or fall back to {@code UTF-8} (which is often safe to do).
+//     @param baseUri     The URL where the HTML was retrieved from, to resolve relative links against.
+//     @return sane HTML
+//
+//     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
+//     */
+//    public static Document parse(InputStream in, String charsetName, String baseUri) throws IOException {
+//        return DataUtil.load(in, charsetName, baseUri);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      Read an input stream, and parse it to a Document. You can provide an alternate parser, such as a simple XML
@@ -169,10 +173,10 @@ public class Jsoup {
      @param timeoutMillis Connection and read timeout, in milliseconds. If exceeded, IOException is thrown.
      @return The parsed HTML.
 
-     @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+     @throws MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
      @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
      @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
-     @throws java.net.SocketTimeoutException if the connection times out
+     @throws SocketTimeoutException if the connection times out
      @throws IOException if a connection or read error occurs
 
      @see #connect(String)
@@ -238,10 +242,10 @@ public class Jsoup {
     /**
      Test if the input HTML has only tags and attributes allowed by the Whitelist. Useful for form validation. The input HTML should
      still be run through the cleaner to set up enforced attributes, and to tidy the output.
-     @param bodyHtml HTML to test
-     @param whitelist whitelist to test against
+     @param bodyHtml HTML to org.jsoup.test
+     @param whitelist whitelist to org.jsoup.test against
      @return true if no tags or attributes were removed; false otherwise
-     @see #clean(String, org.jsoup.safety.Whitelist) 
+     @see #clean(String, Whitelist)
      */
     public static boolean isValid(String bodyHtml, Whitelist whitelist) {
         Document dirty = parseBodyFragment(bodyHtml, "");

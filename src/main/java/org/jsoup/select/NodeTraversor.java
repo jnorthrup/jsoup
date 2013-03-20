@@ -38,7 +38,7 @@ public class NodeTraversor {
                     depth--;
                 }
                 visitor.tail(node, depth);
-                if (node == root)
+                if (node.equals(root))
                     break;
                 node = node.nextSibling();
             }

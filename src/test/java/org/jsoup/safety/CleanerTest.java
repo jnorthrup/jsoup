@@ -147,10 +147,10 @@ public class CleanerTest {
     }
 
     @Test public void supplyOutputSettings() {
-        // test that one can override the default document output settings
+        // org.jsoup.test that one can override the default document output settings
         Document.OutputSettings os = new Document.OutputSettings();
         os.prettyPrint(false);
-        os.escapeMode(Entities.EscapeMode.extended);
+        os.escapeMode(Entities.EscapeMode.extendedHtml);
 
         String html = "<div><p>&bernou;</p></div>";
         String customOut = Jsoup.clean(html, "http://foo.com/", Whitelist.relaxed(), os);
@@ -163,7 +163,7 @@ public class CleanerTest {
             "</div>", defaultOut);
 
         os.charset("ASCII");
-        os.escapeMode(Entities.EscapeMode.base);
+        os.escapeMode(Entities.EscapeMode.defaultHtml);
         String customOut2 = Jsoup.clean(html, "http://foo.com/", Whitelist.relaxed(), os);
         assertEquals("<div><p>&#8492;</p></div>", customOut2);
     }
@@ -175,7 +175,7 @@ public class CleanerTest {
 
         Document dirtyDoc = Jsoup.parse(dirty);
         Document cleanDoc = new Cleaner(Whitelist.basic()).clean(dirtyDoc);
-        assertFalse(cleanDoc == null);
+        assertNotNull(cleanDoc);
         assertEquals(0, cleanDoc.body().childNodeSize());
     }
 

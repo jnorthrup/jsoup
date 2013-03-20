@@ -8,23 +8,23 @@ import org.jsoup.nodes.Attributes;
  * Parse tokens for the Tokeniser.
  */
 abstract class Token {
-    TokenType type;
+    Token.TokenType type;
 
     private Token() {
     }
     
     String tokenType() {
-        return this.getClass().getSimpleName();
+        return getClass().getSimpleName();
     }
 
     static class Doctype extends Token {
         final StringBuilder name = new StringBuilder();
         final StringBuilder publicIdentifier = new StringBuilder();
         final StringBuilder systemIdentifier = new StringBuilder();
-        boolean forceQuirks = false;
+        boolean forceQuirks;
 
         Doctype() {
-            type = TokenType.Doctype;
+            type = Token.TokenType.Doctype;
         }
 
         String getName() {
@@ -44,12 +44,12 @@ abstract class Token {
         }
     }
 
-    static abstract class Tag extends Token {
-        protected String tagName;
+    abstract static class Tag extends Token {
+        String tagName;
         private String pendingAttributeName; // attribute names are generally caught in one hop, not accumulated
         private StringBuilder pendingAttributeValue; // but values are accumulated, from e.g. & in hrefs
 
-        boolean selfClosing = false;
+        boolean selfClosing;
         Attributes attributes; // start tags get attributes on construction. End tags get attributes on first new attribute (but only for parser convenience, not used).
 
         void newAttribute() {
@@ -58,10 +58,7 @@ abstract class Token {
 
             if (pendingAttributeName != null) {
                 Attribute attribute;
-                if (pendingAttributeValue == null)
-                    attribute = new Attribute(pendingAttributeName, "");
-                else
-                    attribute = new Attribute(pendingAttributeName, pendingAttributeValue.toString());
+                attribute = pendingAttributeValue == null ? new Attribute(pendingAttributeName, "") : new Attribute(pendingAttributeName, pendingAttributeValue.toString());
                 attributes.put(attribute);
             }
             pendingAttributeName = null;
@@ -78,11 +75,11 @@ abstract class Token {
         }
 
         String name() {
-            Validate.isFalse(tagName.length() == 0);
+            Validate.isFalse(tagName.isEmpty());
             return tagName;
         }
 
-        Tag name(String name) {
+        Token.Tag name(String name) {
             tagName = name;
             return this;
         }
@@ -91,14 +88,14 @@ abstract class Token {
             return selfClosing;
         }
 
-        @SuppressWarnings({"TypeMayBeWeakened"})
+        @SuppressWarnings("TypeMayBeWeakened")
         Attributes getAttributes() {
             return attributes;
         }
 
         // these appenders are rarely hit in not null state-- caused by null chars.
         void appendTagName(String append) {
-            tagName = tagName == null ? append : tagName.concat(append);
+            tagName = tagName == null ? append : tagName + append;
         }
 
         void appendTagName(char append) {
@@ -106,7 +103,7 @@ abstract class Token {
         }
 
         void appendAttributeName(String append) {
-            pendingAttributeName = pendingAttributeName == null ? append : pendingAttributeName.concat(append);
+            pendingAttributeName = pendingAttributeName == null ? append : pendingAttributeName + append;
         }
 
         void appendAttributeName(char append) {
@@ -122,56 +119,51 @@ abstract class Token {
         }
     }
 
-    static class StartTag extends Tag {
+    static class StartTag extends Token.Tag {
         StartTag() {
-            super();
             attributes = new Attributes();
-            type = TokenType.StartTag;
+            type = Token.TokenType.StartTag;
         }
 
         StartTag(String name) {
             this();
-            this.tagName = name;
+            tagName = name;
         }
 
         StartTag(String name, Attributes attributes) {
             this();
-            this.tagName = name;
+            tagName = name;
             this.attributes = attributes;
         }
 
         @Override
         public String toString() {
-            if (attributes != null && attributes.size() > 0)
-                return "<" + name() + " " + attributes.toString() + ">";
-            else
-                return "<" + name() + ">";
+            return attributes != null && attributes.size() > 0 ? '<' + name() + ' ' + attributes.toString() + '>' : '<' + name() + '>';
         }
     }
 
-    static class EndTag extends Tag{
+    static class EndTag extends Token.Tag{
         EndTag() {
-            super();
-            type = TokenType.EndTag;
+            type = Token.TokenType.EndTag;
         }
 
         EndTag(String name) {
             this();
-            this.tagName = name;
+            tagName = name;
         }
 
         @Override
         public String toString() {
-            return "</" + name() + ">";
+            return "</" + name() + '>';
         }
     }
 
     static class Comment extends Token {
         final StringBuilder data = new StringBuilder();
-        boolean bogus = false;
+        boolean bogus;
 
         Comment() {
-            type = TokenType.Comment;
+            type = Token.TokenType.Comment;
         }
 
         String getData() {
@@ -188,7 +180,7 @@ abstract class Token {
         private final String data;
 
         Character(String data) {
-            type = TokenType.Character;
+            type = Token.TokenType.Character;
             this.data = data;
         }
 
@@ -198,7 +190,7 @@ abstract class Token {
 
         @Override
         public String toString() {
-            return getData();
+            return data;
         }
     }
 
@@ -209,47 +201,47 @@ abstract class Token {
     }
 
     boolean isDoctype() {
-        return type == TokenType.Doctype;
+        return type == Token.TokenType.Doctype;
     }
 
-    Doctype asDoctype() {
-        return (Doctype) this;
+    Token.Doctype asDoctype() {
+        return (Token.Doctype) this;
     }
 
     boolean isStartTag() {
-        return type == TokenType.StartTag;
+        return type == Token.TokenType.StartTag;
     }
 
-    StartTag asStartTag() {
-        return (StartTag) this;
+    Token.StartTag asStartTag() {
+        return (Token.StartTag) this;
     }
 
     boolean isEndTag() {
-        return type == TokenType.EndTag;
+        return type == Token.TokenType.EndTag;
     }
 
-    EndTag asEndTag() {
-        return (EndTag) this;
+    Token.EndTag asEndTag() {
+        return (Token.EndTag) this;
     }
 
     boolean isComment() {
-        return type == TokenType.Comment;
+        return type == Token.TokenType.Comment;
     }
 
-    Comment asComment() {
-        return (Comment) this;
+    Token.Comment asComment() {
+        return (Token.Comment) this;
     }
 
     boolean isCharacter() {
-        return type == TokenType.Character;
+        return type == Token.TokenType.Character;
     }
 
-    Character asCharacter() {
-        return (Character) this;
+    Token.Character asCharacter() {
+        return (Token.Character) this;
     }
 
     boolean isEOF() {
-        return type == TokenType.EOF;
+        return type == Token.TokenType.EOF;
     }
 
     enum TokenType {

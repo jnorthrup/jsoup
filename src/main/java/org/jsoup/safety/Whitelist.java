@@ -48,10 +48,10 @@ import java.util.Set;
  @author Jonathan Hedley
  */
 public class Whitelist {
-    private Set<TagName> tagNames; // tags allowed, lower case. e.g. [p, br, span]
-    private Map<TagName, Set<AttributeKey>> attributes; // tag -> attribute[]. allowed attributes [href] for a tag.
-    private Map<TagName, Map<AttributeKey, AttributeValue>> enforcedAttributes; // always set these attribute values
-    private Map<TagName, Map<AttributeKey, Set<Protocol>>> protocols; // allowed URL protocols for attributes
+    private Set<Whitelist.TagName> tagNames; // tags allowed, lower case. e.g. [p, br, span]
+    private Map<Whitelist.TagName, Set<Whitelist.AttributeKey>> attributes; // tag -> attribute[]. allowed attributes [href] for a tag.
+    private Map<Whitelist.TagName, Map<Whitelist.AttributeKey, Whitelist.AttributeValue>> enforcedAttributes; // always set these attribute values
+    private Map<Whitelist.TagName, Map<Whitelist.AttributeKey, Set<Whitelist.Protocol>>> protocols; // allowed URL protocols for attributes
     private boolean preserveRelativeLinks; // option to preserve relative links
 
     /**
@@ -168,10 +168,10 @@ public class Whitelist {
      @see #relaxed()
      */
     public Whitelist() {
-        tagNames = new HashSet<TagName>();
-        attributes = new HashMap<TagName, Set<AttributeKey>>();
-        enforcedAttributes = new HashMap<TagName, Map<AttributeKey, AttributeValue>>();
-        protocols = new HashMap<TagName, Map<AttributeKey, Set<Protocol>>>();
+        tagNames = new HashSet<>();
+        attributes = new HashMap<>();
+        enforcedAttributes = new HashMap<>();
+        protocols = new HashMap<>();
         preserveRelativeLinks = false;
     }
 
@@ -186,7 +186,7 @@ public class Whitelist {
 
         for (String tagName : tags) {
             Validate.notEmpty(tagName);
-            tagNames.add(TagName.valueOf(tagName));
+            tagNames.add(Whitelist.TagName.valueOf(tagName));
         }
         return this;
     }
@@ -209,16 +209,16 @@ public class Whitelist {
         Validate.notNull(keys);
         Validate.isTrue(keys.length > 0, "No attributes supplied.");
 
-        TagName tagName = TagName.valueOf(tag);
+        Whitelist.TagName tagName = Whitelist.TagName.valueOf(tag);
         if (!tagNames.contains(tagName))
             tagNames.add(tagName);
-        Set<AttributeKey> attributeSet = new HashSet<AttributeKey>();
+        Set<Whitelist.AttributeKey> attributeSet = new HashSet<>();
         for (String key : keys) {
             Validate.notEmpty(key);
-            attributeSet.add(AttributeKey.valueOf(key));
+            attributeSet.add(Whitelist.AttributeKey.valueOf(key));
         }
         if (attributes.containsKey(tagName)) {
-            Set<AttributeKey> currentSet = attributes.get(tagName);
+            Set<Whitelist.AttributeKey> currentSet = attributes.get(tagName);
             currentSet.addAll(attributeSet);
         } else {
             attributes.put(tagName, attributeSet);
@@ -238,21 +238,21 @@ public class Whitelist {
      @param value The enforced attribute value
      @return this (for chaining)
      */
-    public Whitelist addEnforcedAttribute(String tag, String key, String value) {
+    Whitelist addEnforcedAttribute(String tag, String key, String value) {
         Validate.notEmpty(tag);
         Validate.notEmpty(key);
         Validate.notEmpty(value);
 
-        TagName tagName = TagName.valueOf(tag);
+        Whitelist.TagName tagName = Whitelist.TagName.valueOf(tag);
         if (!tagNames.contains(tagName))
             tagNames.add(tagName);
-        AttributeKey attrKey = AttributeKey.valueOf(key);
-        AttributeValue attrVal = AttributeValue.valueOf(value);
+        Whitelist.AttributeKey attrKey = Whitelist.AttributeKey.valueOf(key);
+        Whitelist.AttributeValue attrVal = Whitelist.AttributeValue.valueOf(value);
 
         if (enforcedAttributes.containsKey(tagName)) {
             enforcedAttributes.get(tagName).put(attrKey, attrVal);
         } else {
-            Map<AttributeKey, AttributeValue> attrMap = new HashMap<AttributeKey, AttributeValue>();
+            Map<Whitelist.AttributeKey, Whitelist.AttributeValue> attrMap = new HashMap<>();
             attrMap.put(attrKey, attrVal);
             enforcedAttributes.put(tagName, attrMap);
         }
@@ -294,26 +294,26 @@ public class Whitelist {
         Validate.notEmpty(key);
         Validate.notNull(protocols);
 
-        TagName tagName = TagName.valueOf(tag);
-        AttributeKey attrKey = AttributeKey.valueOf(key);
-        Map<AttributeKey, Set<Protocol>> attrMap;
-        Set<Protocol> protSet;
+        Whitelist.TagName tagName = Whitelist.TagName.valueOf(tag);
+        Whitelist.AttributeKey attrKey = Whitelist.AttributeKey.valueOf(key);
+        Map<Whitelist.AttributeKey, Set<Whitelist.Protocol>> attrMap;
+        Set<Whitelist.Protocol> protSet;
 
         if (this.protocols.containsKey(tagName)) {
             attrMap = this.protocols.get(tagName);
         } else {
-            attrMap = new HashMap<AttributeKey, Set<Protocol>>();
+            attrMap = new HashMap<>();
             this.protocols.put(tagName, attrMap);
         }
         if (attrMap.containsKey(attrKey)) {
             protSet = attrMap.get(attrKey);
         } else {
-            protSet = new HashSet<Protocol>();
+            protSet = new HashSet<>();
             attrMap.put(attrKey, protSet);
         }
         for (String protocol : protocols) {
             Validate.notEmpty(protocol);
-            Protocol prot = Protocol.valueOf(protocol);
+            Whitelist.Protocol prot = Whitelist.Protocol.valueOf(protocol);
             protSet.add(prot);
         }
         return this;
@@ -321,29 +321,29 @@ public class Whitelist {
 
     /**
      * Test if the supplied tag is allowed by this whitelist
-     * @param tag test tag
+     * @param tag org.jsoup.test tag
      * @return true if allowed
      */
-    protected boolean isSafeTag(String tag) {
-        return tagNames.contains(TagName.valueOf(tag));
+    boolean isSafeTag(String tag) {
+        return tagNames.contains(Whitelist.TagName.valueOf(tag));
     }
 
     /**
      * Test if the supplied attribute is allowed by this whitelist for this tag
      * @param tagName tag to consider allowing the attribute in
-     * @param el element under test, to confirm protocol
-     * @param attr attribute under test
+     * @param el element under org.jsoup.test, to confirm protocol
+     * @param attr attribute under org.jsoup.test
      * @return true if allowed
      */
     boolean isSafeAttribute(String tagName, Element el, Attribute attr) {
-        TagName tag = TagName.valueOf(tagName);
-        AttributeKey key = AttributeKey.valueOf(attr.getKey());
+        Whitelist.TagName tag = Whitelist.TagName.valueOf(tagName);
+        Whitelist.AttributeKey key = Whitelist.AttributeKey.valueOf(attr.getKey());
 
         if (attributes.containsKey(tag)) {
             if (attributes.get(tag).contains(key)) {
                 if (protocols.containsKey(tag)) {
-                    Map<AttributeKey, Set<Protocol>> attrProts = protocols.get(tag);
-                    // ok if not defined protocol; otherwise test
+                    Map<Whitelist.AttributeKey, Set<Whitelist.Protocol>> attrProts = protocols.get(tag);
+                    // ok if not defined protocol; otherwise org.jsoup.test
                     return !attrProts.containsKey(key) || testValidProtocol(el, attr, attrProts.get(key));
                 } else { // attribute found, no protocols defined, so OK
                     return true;
@@ -351,20 +351,20 @@ public class Whitelist {
             }
         }
         // no attributes defined for tag, try :all tag
-        return !tagName.equals(":all") && isSafeAttribute(":all", el, attr);
+        return !":all".equals(tagName) && isSafeAttribute(":all", el, attr);
     }
 
-    private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+    private boolean testValidProtocol(Element el, Attribute attr, Iterable<Whitelist.Protocol> protocols) {
         // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
         // rels without a baseuri get removed
         String value = el.absUrl(attr.getKey());
-        if (value.length() == 0)
+        if (value.isEmpty())
             value = attr.getValue(); // if it could not be made abs, run as-is to allow custom unknown protocols
         if (!preserveRelativeLinks)
             attr.setValue(value);
         
-        for (Protocol protocol : protocols) {
-            String prot = protocol.toString() + ":";
+        for (Whitelist.Protocol protocol : protocols) {
+            String prot = protocol.toString() + ':';
             if (value.toLowerCase().startsWith(prot)) {
                 return true;
             }
@@ -374,10 +374,10 @@ public class Whitelist {
 
     Attributes getEnforcedAttributes(String tagName) {
         Attributes attrs = new Attributes();
-        TagName tag = TagName.valueOf(tagName);
+        Whitelist.TagName tag = Whitelist.TagName.valueOf(tagName);
         if (enforcedAttributes.containsKey(tag)) {
-            Map<AttributeKey, AttributeValue> keyVals = enforcedAttributes.get(tag);
-            for (Map.Entry<AttributeKey, AttributeValue> entry : keyVals.entrySet()) {
+            Map<Whitelist.AttributeKey, Whitelist.AttributeValue> keyVals = enforcedAttributes.get(tag);
+            for (Map.Entry<Whitelist.AttributeKey, Whitelist.AttributeValue> entry : keyVals.entrySet()) {
                 attrs.put(entry.getKey().toString(), entry.getValue().toString());
             }
         }
@@ -386,43 +386,43 @@ public class Whitelist {
     
     // named types for config. All just hold strings, but here for my sanity.
 
-    static class TagName extends TypedValue {
+    static class TagName extends Whitelist.TypedValue {
         TagName(String value) {
             super(value);
         }
 
-        static TagName valueOf(String value) {
-            return new TagName(value);
+        static Whitelist.TagName valueOf(String value) {
+            return new Whitelist.TagName(value);
         }
     }
 
-    static class AttributeKey extends TypedValue {
+    static class AttributeKey extends Whitelist.TypedValue {
         AttributeKey(String value) {
             super(value);
         }
 
-        static AttributeKey valueOf(String value) {
-            return new AttributeKey(value);
+        static Whitelist.AttributeKey valueOf(String value) {
+            return new Whitelist.AttributeKey(value);
         }
     }
 
-    static class AttributeValue extends TypedValue {
+    static class AttributeValue extends Whitelist.TypedValue {
         AttributeValue(String value) {
             super(value);
         }
 
-        static AttributeValue valueOf(String value) {
-            return new AttributeValue(value);
+        static Whitelist.AttributeValue valueOf(String value) {
+            return new Whitelist.AttributeValue(value);
         }
     }
 
-    static class Protocol extends TypedValue {
+    static class Protocol extends Whitelist.TypedValue {
         Protocol(String value) {
             super(value);
         }
 
-        static Protocol valueOf(String value) {
-            return new Protocol(value);
+        static Whitelist.Protocol valueOf(String value) {
+            return new Whitelist.Protocol(value);
         }
     }
 
@@ -436,9 +436,9 @@ public class Whitelist {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
+            int prime = 31;
             int result = 1;
-            result = prime * result + ((value == null) ? 0 : value.hashCode());
+            result = prime * result + (value == null ? 0 : value.hashCode());
             return result;
         }
 
@@ -447,7 +447,7 @@ public class Whitelist {
             if (this == obj) return true;
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
-            TypedValue other = (TypedValue) obj;
+            Whitelist.TypedValue other = (Whitelist.TypedValue) obj;
             if (value == null) {
                 if (other.value != null) return false;
             } else if (!value.equals(other.value)) return false;

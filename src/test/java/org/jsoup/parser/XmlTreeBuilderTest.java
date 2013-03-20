@@ -5,7 +5,7 @@ import org.jsoup.TextUtil;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,12 +29,12 @@ public class XmlTreeBuilderTest {
         Document doc = tb.parse(xml, "http://foo.com/");
         assertEquals("<doc id=\"2\" href=\"/bar\">Foo <br /><link>One</link><link>Two</link></doc>",
                 TextUtil.stripNewlines(doc.html()));
-        assertEquals(doc.getElementById("2").absUrl("href"), "http://foo.com/bar");
+        assertEquals("http://foo.com/bar", doc.getElementById("2").absUrl("href"));
     }
 
     @Test
     public void testPopToClose() {
-        // test: </val> closes Two, </bar> ignored
+        // org.jsoup.test: </val> closes Two, </bar> ignored
         String xml = "<doc><val>One<val>Two</val></bar>Three</doc>";
         XmlTreeBuilder tb = new XmlTreeBuilder();
         Document doc = tb.parse(xml, "http://foo.com/");
@@ -62,7 +62,7 @@ public class XmlTreeBuilderTest {
     @Ignore
     @Test
     public void testSupplyParserToConnection() throws IOException {
-        String xmlUrl = "http://direct.infohound.net/tools/jsoup-xml-test.xml";
+        String xmlUrl = "http://direct.infohound.net/tools/jsoup-xml-org.jsoup.test.xml";
 
         // parse with both xml and html parser, ensure different
         Document xmlDoc = Jsoup.connect(xmlUrl).parser(Parser.xmlParser()).get();
@@ -78,10 +78,11 @@ public class XmlTreeBuilderTest {
     @Test
     public void testSupplyParserToDataStream() throws IOException, URISyntaxException {
         File xmlFile = new File(XmlTreeBuilder.class.getResource("/htmltests/xml-test.xml").toURI());
-        InputStream inStream = new FileInputStream(xmlFile);
-        Document doc = Jsoup.parse(inStream, null, "http://foo.com", Parser.xmlParser());
-        assertEquals("<doc><val>One<val>Two</val>Three</val></doc>",
-                TextUtil.stripNewlines(doc.html()));
+        try (InputStream inStream = new FileInputStream(xmlFile)) {
+            Document doc = Jsoup.parse(inStream, null, "http://foo.com", Parser.xmlParser());
+            assertEquals("<doc><val>One<val>Two</val>Three</val></doc>",
+                    TextUtil.stripNewlines(doc.html()));
+        }
     }
 
     @Test

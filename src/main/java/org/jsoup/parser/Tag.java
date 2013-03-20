@@ -11,16 +11,16 @@ import java.util.Map;
  * @author Jonathan Hedley, jonathan@hedley.net
  */
 public class Tag {
-    private static final Map<String, Tag> tags = new HashMap<String, Tag>(); // map of known tags
+    private static final Map<String, Tag> tags = new HashMap<>(); // map of known tags
 
     private String tagName;
     private boolean isBlock = true; // block or inline
     private boolean formatAsBlock = true; // should be formatted as a block
     private boolean canContainBlock = true; // Can this tag hold block level tags?
     private boolean canContainInline = true; // only pcdata if not
-    private boolean empty = false; // can hold nothing; e.g. img
-    private boolean selfClosing = false; // can self close (<foo />). used for unknown tags that self close, without forcing them as empty.
-    private boolean preserveWhitespace = false; // for pre, textarea, script etc
+    private boolean empty; // can hold nothing; e.g. img
+    private boolean selfClosing; // can self close (<foo />). used for unknown tags that self close, without forcing them as empty.
+    private boolean preserveWhitespace; // for pre, textarea, script etc
 
     private Tag(String tagName) {
         this.tagName = tagName.toLowerCase();
@@ -80,14 +80,16 @@ public class Tag {
         return formatAsBlock;
     }
 
-    /**
-     * Gets if this tag can contain block tags.
-     *
-     * @return if tag can contain block tags
-     */
-    public boolean canContainBlock() {
-        return canContainBlock;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Gets if this tag can contain block tags.
+//     *
+//     * @return if tag can contain block tags
+//     */
+//    public boolean canContainBlock() {
+//        return canContainBlock;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Gets if this tag is an inline tag.
@@ -98,23 +100,27 @@ public class Tag {
         return !isBlock;
     }
 
-    /**
-     * Gets if this tag is a data only tag.
-     *
-     * @return if this tag is a data only tag
-     */
-    public boolean isData() {
-        return !canContainInline && !isEmpty();
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Gets if this tag is a data only tag.
+//     *
+//     * @return if this tag is a data only tag
+//     */
+//    public boolean isData() {
+//        return !canContainInline && !empty;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Get if this is an empty tag
-     *
-     * @return if this is an empty tag
-     */
-    public boolean isEmpty() {
-        return empty;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Get if this is an empty tag
+//     *
+//     * @return if this is an empty tag
+//     */
+//    public boolean isEmpty() {
+//        return empty;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     /**
      * Get if this tag is self closing.

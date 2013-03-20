@@ -3,6 +3,7 @@ package org.jsoup.select;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.safety.Cleaner;
 
 import java.util.*;
 
@@ -16,22 +17,22 @@ public class Elements implements List<Element>, Cloneable {
     private List<Element> contents;
 
     public Elements() {
-        contents = new ArrayList<Element>();
+        contents = new ArrayList<>();
     }
 
     public Elements(int initialCapacity) {
-        contents = new ArrayList<Element>(initialCapacity);
+        contents = new ArrayList<>(initialCapacity);
     }
 
     public Elements(Collection<Element> elements) {
-        contents = new ArrayList<Element>(elements);
+        contents = new ArrayList<>(elements);
     }
     
     public Elements(List<Element> elements) {
         contents = elements;
     }
     
-    public Elements(Element... elements) {
+    private Elements(Element... elements) {
         this(Arrays.asList(elements));
     }
 
@@ -41,7 +42,7 @@ public class Elements implements List<Element>, Cloneable {
      */
     @Override
 	public Elements clone() {
-    	List<Element> elements = new ArrayList<Element>();
+    	List<Element> elements = new ArrayList<>();
     	
     	for(Element e : contents)
     		elements.add(e.clone());
@@ -159,10 +160,7 @@ public class Elements implements List<Element>, Cloneable {
      * @see Element#val()
      */
     public String val() {
-        if (size() > 0)
-            return first().val();
-        else
-            return "";
+        return size() > 0 ? first().val() : "";
     }
     
     /**
@@ -188,7 +186,7 @@ public class Elements implements List<Element>, Cloneable {
         StringBuilder sb = new StringBuilder();
         for (Element element : contents) {
             if (sb.length() != 0)
-                sb.append(" ");
+                sb.append(' ');
             sb.append(element.text());
         }
         return sb.toString();
@@ -212,7 +210,7 @@ public class Elements implements List<Element>, Cloneable {
         StringBuilder sb = new StringBuilder();
         for (Element element : contents) {
             if (sb.length() != 0)
-                sb.append("\n");
+                sb.append('\n');
             sb.append(element.html());
         }
         return sb.toString();
@@ -228,7 +226,7 @@ public class Elements implements List<Element>, Cloneable {
         StringBuilder sb = new StringBuilder();
         for (Element element : contents) {
             if (sb.length() != 0)
-                sb.append("\n");
+                sb.append('\n');
             sb.append(element.outerHtml());
         }
         return sb.toString();
@@ -385,7 +383,7 @@ public class Elements implements List<Element>, Cloneable {
      * <code>doc.select("p").remove();</code><br>
      * HTML = {@code <div> <img /></div>}
      * <p>
-     * Note that this method should not be used to clean user-submitted HTML; rather, use {@link org.jsoup.safety.Cleaner} to clean HTML.
+     * Note that this method should not be used to clean user-submitted HTML; rather, use {@link Cleaner} to clean HTML.
      * @return this, for chaining
      * @see Element#empty()
      * @see #empty()
@@ -449,7 +447,7 @@ public class Elements implements List<Element>, Cloneable {
      * @return all of the parents and ancestor elements of the matched elements
      */
     public Elements parents() {
-        HashSet<Element> combo = new LinkedHashSet<Element>();
+        HashSet<Element> combo = new LinkedHashSet<>();
         for (Element e: contents) {
             combo.addAll(e.parents());
         }

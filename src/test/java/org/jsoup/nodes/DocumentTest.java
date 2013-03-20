@@ -44,10 +44,10 @@ public class DocumentTest {
         assertEquals("UTF-8", doc.outputSettings().charset().displayName());
 
         doc.outputSettings().charset("ascii");
-        assertEquals(Entities.EscapeMode.base, doc.outputSettings().escapeMode());
+        assertEquals(Entities.EscapeMode.defaultHtml, doc.outputSettings().escapeMode());
         assertEquals("<p title=\"&#960;\">&#960; &amp; &lt; &gt; </p>", doc.body().html());
 
-        doc.outputSettings().escapeMode(Entities.EscapeMode.extended);
+        doc.outputSettings().escapeMode(Entities.EscapeMode.extendedHtml);
         assertEquals("<p title=\"&pi;\">&pi; &amp; &lt; &gt; </p>", doc.body().html());
     }
 
@@ -74,11 +74,11 @@ public class DocumentTest {
     }
 
     @Test public void testClonesDeclarations() {
-        Document doc = Jsoup.parse("<!DOCTYPE html><html><head><title>Doctype test");
+        Document doc = Jsoup.parse("<!DOCTYPE html><html><head><title>Doctype org.jsoup.test");
         Document clone = doc.clone();
 
         assertEquals(doc.html(), clone.html());
-        assertEquals("<!DOCTYPE html><html><head><title>Doctype test</title></head><body></body></html>",
+        assertEquals("<!DOCTYPE html><html><head><title>Doctype org.jsoup.test</title></head><body></body></html>",
                 TextUtil.stripNewlines(clone.html()));
     }
 

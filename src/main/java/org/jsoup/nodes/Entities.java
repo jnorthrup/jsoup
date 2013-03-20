@@ -14,16 +14,16 @@ import java.util.regex.Pattern;
  * Source: <a href="http://www.w3.org/TR/html5/named-character-references.html#named-character-references">W3C HTML
  * named character references</a>.
  */
-public class Entities {
+public final class Entities {
     public enum EscapeMode {
         /** Restricted entities suitable for XHTML output: lt, gt, amp, apos, and quot only. */
         xhtml(xhtmlByVal),
         /** Default HTML output entities. */
-        base(baseByVal),
+        defaultHtml(baseByVal),
         /** Complete HTML entities. */
-        extended(fullByVal);
+        extendedHtml(fullByVal);
 
-        private Map<Character, String> map;
+        private final Map<Character, String> map;
 
         EscapeMode(Map<Character, String> map) {
             this.map = map;
@@ -39,8 +39,6 @@ public class Entities {
     private static final Map<String, Character> base;
     private static final Map<Character, String> baseByVal;
     private static final Map<Character, String> fullByVal;
-    private static final Pattern unescapePattern = Pattern.compile("&(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+\\d*);?");
-    private static final Pattern strictUnescapePattern = Pattern.compile("&(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+\\d*);");
 
     private Entities() {}
 
@@ -76,7 +74,7 @@ public class Entities {
         return escape(string, out.encoder(), out.escapeMode());
     }
 
-    static String escape(String string, CharsetEncoder encoder, EscapeMode escapeMode) {
+    static String escape(CharSequence string, CharsetEncoder encoder, Entities.EscapeMode escapeMode) {
         StringBuilder accum = new StringBuilder(string.length() * 2);
         Map<Character, String> map = escapeMode.getMap();
 
@@ -117,31 +115,29 @@ public class Entities {
     };
 
     static {
-        xhtmlByVal = new HashMap<Character, String>();
+        xhtmlByVal = new HashMap<>();
         base = loadEntities("entities-base.properties");  // most common / default
         baseByVal = toCharacterKey(base);
         full = loadEntities("entities-full.properties"); // extended and overblown.
         fullByVal = toCharacterKey(full);
 
         for (Object[] entity : xhtmlArray) {
-            Character c = Character.valueOf((char) ((Integer) entity[1]).intValue());
-            xhtmlByVal.put(c, ((String) entity[0]));
+            Character c = (char) ((Integer) entity[1]).intValue();
+            xhtmlByVal.put(c, (String) entity[0]);
         }
     }
 
     private static Map<String, Character> loadEntities(String filename) {
         Properties properties = new Properties();
-        Map<String, Character> entities = new HashMap<String, Character>();
-        try {
-            InputStream in = Entities.class.getResourceAsStream(filename);
-            properties.load(in);
-            in.close();
+        Map<String, Character> entities = new HashMap<>();
+            try (InputStream in = Entities.class.getResourceAsStream(filename)) {
+                properties.load(in);
         } catch (IOException e) {
             throw new MissingResourceException("Error loading entities resource: " + e.getMessage(), "Entities", filename);
         }
 
         for (Map.Entry entry: properties.entrySet()) {
-            Character val = Character.valueOf((char) Integer.parseInt((String) entry.getValue(), 16));
+            Character val = (char) Integer.parseInt((String) entry.getValue(), 16);
             String name = (String) entry.getKey();
             entities.put(name, val);
         }
@@ -149,7 +145,7 @@ public class Entities {
     }
 
     private static Map<Character, String> toCharacterKey(Map<String, Character> inMap) {
-        Map<Character, String> outMap = new HashMap<Character, String>();
+        Map<Character, String> outMap = new HashMap<>();
         for (Map.Entry<String, Character> entry: inMap.entrySet()) {
             Character character = entry.getValue();
             String name = entry.getKey();

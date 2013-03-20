@@ -58,12 +58,13 @@ public class Selector {
     private final Element root;
 
     private Selector(String query, Element root) {
-        Validate.notNull(query);
-        query = query.trim();
-        Validate.notEmpty(query);
+        String query1 = query;
+        Validate.notNull(query1);
+        query1 = query1.trim();
+        Validate.notEmpty(query1);
         Validate.notNull(root);
 
-        this.evaluator = QueryParser.parse(query);
+        evaluator = QueryParser.parse(query1);
 
         this.root = root;
     }
@@ -89,7 +90,7 @@ public class Selector {
     public static Elements select(String query, Iterable<Element> roots) {
         Validate.notEmpty(query);
         Validate.notNull(roots);
-        LinkedHashSet<Element> elements = new LinkedHashSet<Element>();
+        LinkedHashSet<Element> elements = new LinkedHashSet<>();
 
         for (Element root : roots) {
             elements.addAll(select(query, root));
@@ -102,7 +103,7 @@ public class Selector {
     }
 
     // exclude set. package open so that Elements can implement .not() selector.
-    static Elements filterOut(Collection<Element> elements, Collection<Element> outs) {
+    static Elements filterOut(Iterable<Element> elements, Iterable<Element> outs) {
         Elements output = new Elements();
         for (Element el : elements) {
             boolean found = false;

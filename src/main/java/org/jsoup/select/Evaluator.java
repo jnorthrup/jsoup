@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * Evaluates that an element matches the selector.
  */
 public abstract class Evaluator {
-    protected Evaluator() {
+    Evaluator() {
     }
 
     /**
@@ -26,7 +26,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for tag name
      */
-    public static final class Tag extends Evaluator {
+    public static class Tag extends Evaluator {
         private String tagName;
 
         public Tag(String tagName) {
@@ -35,7 +35,7 @@ public abstract class Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return (element.tagName().equals(tagName));
+            return element.tagName().equals(tagName);
         }
 
         @Override
@@ -47,7 +47,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for element id
      */
-    public static final class Id extends Evaluator {
+    public static class Id extends Evaluator {
         private String id;
 
         public Id(String id) {
@@ -56,7 +56,7 @@ public abstract class Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return (id.equals(element.id()));
+            return id.equals(element.id());
         }
 
         @Override
@@ -69,7 +69,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for element class
      */
-    public static final class Class extends Evaluator {
+    public static class Class extends Evaluator {
         private String className;
 
         public Class(String className) {
@@ -78,7 +78,7 @@ public abstract class Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return (element.hasClass(className));
+            return element.hasClass(className);
         }
 
         @Override
@@ -91,7 +91,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name matching
      */
-    public static final class Attribute extends Evaluator {
+    public static class Attribute extends Evaluator {
         private String key;
 
         public Attribute(String key) {
@@ -113,7 +113,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name prefix matching
      */
-    public static final class AttributeStarting extends Evaluator {
+    public static class AttributeStarting extends Evaluator {
         private String keyPrefix;
 
         public AttributeStarting(String keyPrefix) {
@@ -140,7 +140,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name/value matching
      */
-    public static final class AttributeWithValue extends AttributeKeyPair {
+    public static class AttributeWithValue extends Evaluator.AttributeKeyPair {
         public AttributeWithValue(String key, String value) {
             super(key, value);
         }
@@ -160,7 +160,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name != value matching
      */
-    public static final class AttributeWithValueNot extends AttributeKeyPair {
+    public static class AttributeWithValueNot extends Evaluator.AttributeKeyPair {
         public AttributeWithValueNot(String key, String value) {
             super(key, value);
         }
@@ -180,7 +180,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name/value matching (value prefix)
      */
-    public static final class AttributeWithValueStarting extends AttributeKeyPair {
+    public static class AttributeWithValueStarting extends Evaluator.AttributeKeyPair {
         public AttributeWithValueStarting(String key, String value) {
             super(key, value);
         }
@@ -200,7 +200,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name/value matching (value ending)
      */
-    public static final class AttributeWithValueEnding extends AttributeKeyPair {
+    public static class AttributeWithValueEnding extends Evaluator.AttributeKeyPair {
         public AttributeWithValueEnding(String key, String value) {
             super(key, value);
         }
@@ -220,7 +220,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name/value matching (value containing)
      */
-    public static final class AttributeWithValueContaining extends AttributeKeyPair {
+    public static class AttributeWithValueContaining extends Evaluator.AttributeKeyPair {
         public AttributeWithValueContaining(String key, String value) {
             super(key, value);
         }
@@ -240,7 +240,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for attribute name/value matching (value regex matching)
      */
-    public static final class AttributeWithValueMatching extends Evaluator {
+    public static class AttributeWithValueMatching extends Evaluator {
         String key;
         Pattern pattern;
 
@@ -280,7 +280,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for any / all element matching
      */
-    public static final class AllElements extends Evaluator {
+    public static class AllElements extends Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
@@ -296,7 +296,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching by sibling index number (e < idx)
      */
-    public static final class IndexLessThan extends IndexEvaluator {
+    public static class IndexLessThan extends Evaluator.IndexEvaluator {
         public IndexLessThan(int index) {
             super(index);
         }
@@ -316,7 +316,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching by sibling index number (e > idx)
      */
-    public static final class IndexGreaterThan extends IndexEvaluator {
+    public static class IndexGreaterThan extends Evaluator.IndexEvaluator {
         public IndexGreaterThan(int index) {
             super(index);
         }
@@ -336,7 +336,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching by sibling index number (e = idx)
      */
-    public static final class IndexEquals extends IndexEvaluator {
+    public static class IndexEquals extends Evaluator.IndexEvaluator {
         public IndexEquals(int index) {
             super(index);
         }
@@ -369,7 +369,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching Element (and its descendants) text
      */
-    public static final class ContainsText extends Evaluator {
+    public static class ContainsText extends Evaluator {
         private String searchText;
 
         public ContainsText(String searchText) {
@@ -378,7 +378,7 @@ public abstract class Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return (element.text().toLowerCase().contains(searchText));
+            return element.text().toLowerCase().contains(searchText);
         }
 
         @Override
@@ -390,7 +390,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching Element's own text
      */
-    public static final class ContainsOwnText extends Evaluator {
+    public static class ContainsOwnText extends Evaluator {
         private String searchText;
 
         public ContainsOwnText(String searchText) {
@@ -399,7 +399,7 @@ public abstract class Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return (element.ownText().toLowerCase().contains(searchText));
+            return element.ownText().toLowerCase().contains(searchText);
         }
 
         @Override
@@ -411,7 +411,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching Element (and its descendants) text with regex
      */
-    public static final class Matches extends Evaluator {
+    public static class Matches extends Evaluator {
         private Pattern pattern;
 
         public Matches(Pattern pattern) {
@@ -433,7 +433,7 @@ public abstract class Evaluator {
     /**
      * Evaluator for matching Element's own text with regex
      */
-    public static final class MatchesOwn extends Evaluator {
+    public static class MatchesOwn extends Evaluator {
         private Pattern pattern;
 
         public MatchesOwn(Pattern pattern) {

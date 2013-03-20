@@ -11,8 +11,11 @@ import java.io.IOException;
 /**
  * Example program to list links from a URL.
  */
-public class ListLinks {
-    public static void main(String[] args) throws IOException {
+public final class ListLinks {
+    private ListLinks() {
+    }
+
+    public static void main(String... args) throws IOException {
         Validate.isTrue(args.length == 1, "usage: supply url to fetch");
         String url = args[0];
         print("Fetching %s...", url);
@@ -24,7 +27,7 @@ public class ListLinks {
 
         print("\nMedia: (%d)", media.size());
         for (Element src : media) {
-            if (src.tagName().equals("img"))
+            if ("img".equals(src.tagName()))
                 print(" * %s: <%s> %sx%s (%s)",
                         src.tagName(), src.attr("abs:src"), src.attr("width"), src.attr("height"),
                         trim(src.attr("alt"), 20));
@@ -48,9 +51,6 @@ public class ListLinks {
     }
 
     private static String trim(String s, int width) {
-        if (s.length() > width)
-            return s.substring(0, width-1) + ".";
-        else
-            return s;
+        return s.length() > width ? s.substring(0, width - 1) + '.' : s;
     }
 }

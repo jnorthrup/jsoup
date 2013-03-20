@@ -29,15 +29,17 @@ public class DataNode extends Node{
         return attributes.get(DATA_KEY);
     }
 
-    /**
-     * Set the data contents of this node.
-     * @param data unencoded data
-     * @return this node, for chaining
-     */
-    public DataNode setWholeData(String data) {
-        attributes.put(DATA_KEY, data);
-        return this;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Set the data contents of this node.
+//     * @param data unencoded data
+//     * @return this node, for chaining
+//     */
+//    public DataNode setWholeData(String data) {
+//        attributes.put(DATA_KEY, data);
+//        return this;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     void outerHtmlHead(StringBuilder accum, int depth, Document.OutputSettings out) {
         accum.append(getWholeData()); // data is not escaped in return from data nodes, so " in script, style is plain
@@ -49,14 +51,16 @@ public class DataNode extends Node{
         return outerHtml();
     }
 
-    /**
-     Create a new DataNode from HTML encoded data.
-     @param encodedData encoded data
-     @param baseUri bass URI
-     @return new DataNode
-     */
-    public static DataNode createFromEncoded(String encodedData, String baseUri) {
-        String data = Entities.unescape(encodedData);
-        return new DataNode(data, baseUri);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     Create a new DataNode from HTML encoded data.
+//     @param encodedData encoded data
+//     @param baseUri bass URI
+//     @return new DataNode
+//     */
+//    public static DataNode createFromEncoded(String encodedData, String baseUri) {
+//        String data = Entities.unescape(encodedData);
+//        return new DataNode(data, baseUri);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 }

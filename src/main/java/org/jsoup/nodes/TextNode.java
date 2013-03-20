@@ -3,6 +3,8 @@ package org.jsoup.nodes;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.helper.Validate;
 
+import java.util.regex.Pattern;
+
 /**
  A text node.
 
@@ -14,7 +16,8 @@ public class TextNode extends Node {
     them as needed on the fly.
      */
     private static final String TEXT_KEY = "text";
-    String text;
+    private static final Pattern COMPILE = Pattern.compile("^\\s+");
+    private String text;
 
     /**
      Create a new TextNode representing the supplied (unencoded) text).
@@ -82,7 +85,7 @@ public class TextNode extends Node {
         String head = getWholeText().substring(0, offset);
         String tail = getWholeText().substring(offset);
         text(head);
-        TextNode tailNode = new TextNode(tail, this.baseUri());
+        TextNode tailNode = new TextNode(tail, baseUri());
         if (parent() != null)
             parent().addChildren(siblingIndex()+1, tailNode);
 
@@ -91,7 +94,7 @@ public class TextNode extends Node {
 
     void outerHtmlHead(StringBuilder accum, int depth, Document.OutputSettings out) {
         String html = Entities.escape(getWholeText(), out);
-        if (out.prettyPrint() && parent() instanceof Element && !Element.preserveWhitespace((Element) parent())) {
+        if (out.prettyPrint() && parent() instanceof Element && !Element.preserveWhitespace(parent())) {
             html = normaliseWhitespace(html);
         }
 
@@ -106,26 +109,28 @@ public class TextNode extends Node {
         return outerHtml();
     }
 
-    /**
-     * Create a new TextNode from HTML encoded (aka escaped) data.
-     * @param encodedText Text containing encoded HTML (e.g. &amp;lt;)
-     * @return TextNode containing unencoded data (e.g. &lt;)
-     */
-    public static TextNode createFromEncoded(String encodedText, String baseUri) {
-        String text = Entities.unescape(encodedText);
-        return new TextNode(text, baseUri);
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Create a new TextNode from HTML encoded (aka escaped) data.
+//     * @param encodedText Text containing encoded HTML (e.g. &amp;lt;)
+//     * @return TextNode containing unencoded data (e.g. &lt;)
+//     */
+//    public static TextNode createFromEncoded(String encodedText, String baseUri) {
+//        String text = Entities.unescape(encodedText);
+//        return new TextNode(text, baseUri);
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     static String normaliseWhitespace(String text) {
-        text = StringUtil.normaliseWhitespace(text);
-        return text;
+        String text1 = StringUtil.normaliseWhitespace(text);
+        return text1;
     }
 
     static String stripLeadingWhitespace(String text) {
-        return text.replaceFirst("^\\s+", "");
+        return COMPILE.matcher(text).replaceFirst("");
     }
 
-    static boolean lastCharIsWhitespace(StringBuilder sb) {
+    static boolean lastCharIsWhitespace(CharSequence sb) {
         return sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ';
     }
 

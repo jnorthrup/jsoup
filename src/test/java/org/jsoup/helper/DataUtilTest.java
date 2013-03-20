@@ -1,9 +1,11 @@
 package org.jsoup.helper;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -15,16 +17,16 @@ public class DataUtilTest {
         assertEquals("utf-8", DataUtil.getCharsetFromContentType("text/html;charset=utf-8 "));
         assertEquals("UTF-8", DataUtil.getCharsetFromContentType("text/html; charset=UTF-8"));
         assertEquals("ISO-8859-1", DataUtil.getCharsetFromContentType("text/html; charset=ISO-8859-1"));
-        assertEquals(null, DataUtil.getCharsetFromContentType("text/html"));
-        assertEquals(null, DataUtil.getCharsetFromContentType(null));
-        assertEquals(null, DataUtil.getCharsetFromContentType("text/html;charset=Unknown"));
+        assertNull(DataUtil.getCharsetFromContentType("text/html"));
+        assertNull(DataUtil.getCharsetFromContentType(null));
+        assertNull(DataUtil.getCharsetFromContentType("text/html;charset=Unknown"));
     }
 
     @Test public void testQuotedCharset() {
         assertEquals("utf-8", DataUtil.getCharsetFromContentType("text/html; charset=\"utf-8\""));
         assertEquals("UTF-8", DataUtil.getCharsetFromContentType("text/html;charset=\"UTF-8\""));
         assertEquals("ISO-8859-1", DataUtil.getCharsetFromContentType("text/html; charset=\"ISO-8859-1\""));
-        assertEquals(null, DataUtil.getCharsetFromContentType("text/html; charset=\"Unsupported\""));
+        assertNull(DataUtil.getCharsetFromContentType("text/html; charset=\"Unsupported\""));
     }
     
     @Test public void discardsSpuriousByteOrderMark() {

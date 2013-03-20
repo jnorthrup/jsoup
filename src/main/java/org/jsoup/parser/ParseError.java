@@ -13,25 +13,29 @@ public class ParseError {
     }
 
     ParseError(int pos, String errorFormat, Object... args) {
-        this.errorMsg = String.format(errorFormat, args);
+        errorMsg = String.format(errorFormat, args);
         this.pos = pos;
     }
 
-    /**
-     * Retrieve the error message.
-     * @return the error message.
-     */
-    public String getErrorMessage() {
-        return errorMsg;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Retrieve the error message.
+//     * @return the error message.
+//     */
+//    public String getErrorMessage() {
+//        return errorMsg;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
-    /**
-     * Retrieves the offset of the error.
-     * @return error offset within input
-     */
-    public int getPosition() {
-        return pos;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    /**
+//     * Retrieves the offset of the error.
+//     * @return error offset within input
+//     */
+//    public int getPosition() {
+//        return pos;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     @Override
     public String toString() {

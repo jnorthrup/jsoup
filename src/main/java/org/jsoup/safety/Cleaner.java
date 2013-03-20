@@ -1,5 +1,6 @@
 package org.jsoup.safety;
 
+import org.jsoup.Jsoup;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.*;
 import org.jsoup.parser.Tag;
@@ -18,7 +19,7 @@ import java.util.List;
  It is assumed that the input HTML is a body fragment; the clean methods only pull from the source's body, and the
  canned white-lists only allow body contained tags.
  <p/>
- Rather than interacting directly with a Cleaner object, generally see the {@code clean} methods in {@link org.jsoup.Jsoup}.
+ Rather than interacting directly with a Cleaner object, generally see the {@code clean} methods in {@link Jsoup}.
  */
 public class Cleaner {
     private Whitelist whitelist;
@@ -55,7 +56,7 @@ public class Cleaner {
      This method can be used as a validator for user input forms. An invalid document will still be cleaned successfully
      using the {@link #clean(Document)} document. If using as a validator, it is recommended to still clean the document
      to ensure enforced attributes are set correctly, and that the output is tidied.
-     @param dirtyDocument document to test
+     @param dirtyDocument document to org.jsoup.test
      @return true if no tags or attributes need to be removed; false if they do
      */
     public boolean isValid(Document dirtyDocument) {
@@ -70,11 +71,11 @@ public class Cleaner {
      Iterates the input and copies trusted nodes (tags, attributes, text) into the destination.
      */
     private final class CleaningVisitor implements NodeVisitor {
-        private int numDiscarded = 0;
+        int numDiscarded;
         private final Element root;
         private Element destination; // current element to append nodes to
 
-        private CleaningVisitor(Element root, Element destination) {
+        CleaningVisitor(Element root, Element destination) {
             this.root = root;
             this.destination = destination;
         }
@@ -84,13 +85,13 @@ public class Cleaner {
                 Element sourceEl = (Element) source;
 
                 if (whitelist.isSafeTag(sourceEl.tagName())) { // safe, clone and copy safe attrs
-                    ElementMeta meta = createSafeElement(sourceEl);
+                    Cleaner.ElementMeta meta = createSafeElement(sourceEl);
                     Element destChild = meta.el;
                     destination.appendChild(destChild);
 
                     numDiscarded += meta.numAttribsDiscarded;
                     destination = destChild;
-                } else if (source != root) { // not a safe tag, so don't add. don't count root against discarded.
+                } else if (!source.equals(root)) { // not a safe tag, so don't add. don't count root against discarded.
                     numDiscarded++;
                 }
             } else if (source instanceof TextNode) {
@@ -110,13 +111,13 @@ public class Cleaner {
     }
 
     private int copySafeNodes(Element source, Element dest) {
-        CleaningVisitor cleaningVisitor = new CleaningVisitor(source, dest);
+        Cleaner.CleaningVisitor cleaningVisitor = new Cleaner.CleaningVisitor(source, dest);
         NodeTraversor traversor = new NodeTraversor(cleaningVisitor);
         traversor.traverse(source);
         return cleaningVisitor.numDiscarded;
     }
 
-    private ElementMeta createSafeElement(Element sourceEl) {
+    private Cleaner.ElementMeta createSafeElement(Element sourceEl) {
         String sourceTag = sourceEl.tagName();
         Attributes destAttrs = new Attributes();
         Element dest = new Element(Tag.valueOf(sourceTag), sourceEl.baseUri(), destAttrs);
@@ -132,7 +133,7 @@ public class Cleaner {
         Attributes enforcedAttrs = whitelist.getEnforcedAttributes(sourceTag);
         destAttrs.addAll(enforcedAttrs);
 
-        return new ElementMeta(dest, numDiscarded);
+        return new Cleaner.ElementMeta(dest, numDiscarded);
     }
 
     private static class ElementMeta {

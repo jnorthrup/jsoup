@@ -168,7 +168,7 @@ public class SelectorTest {
         assertEquals("div", els.get(1).tagName());
         assertEquals("bar", els.get(1).attr("title"));
         assertEquals("div", els.get(2).tagName());
-        assertTrue(els.get(2).attr("title").length() == 0); // missing attributes come back as empty string
+        assertTrue(els.get(2).attr("title").isEmpty()); // missing attributes come back as empty string
         assertFalse(els.get(2).hasAttr("title"));
         assertEquals("p", els.get(3).tagName());
         assertEquals("span", els.get(4).tagName());
@@ -449,13 +449,13 @@ public class SelectorTest {
         assertEquals(1, divs.size());
         assertEquals("One", divs.first().text());
 
-        // test matches in has
+        // org.jsoup.test matches in has
         divs = doc.select("div:has(p:matches((?i)two))");
         assertEquals(1, divs.size());
         assertEquals("div", divs.first().tagName());
         assertEquals("Two", divs.first().text());
 
-        // test contains in has
+        // org.jsoup.test contains in has
         divs = doc.select("div:has(p:contains(two))");
         assertEquals(1, divs.size());
         assertEquals("div", divs.first().tagName());
@@ -524,7 +524,7 @@ public class SelectorTest {
         assertEquals(1, p5.size());
         assertEquals("2", p5.first().id());
 
-        Elements p6 = doc.select("p:matches(\\w+\\s+\\(\\w+\\))"); // test bracket matching
+        Elements p6 = doc.select("p:matches(\\w+\\s+\\(\\w+\\))"); // org.jsoup.test bracket matching
         assertEquals(1, p6.size());
         assertEquals("3", p6.first().id());
 

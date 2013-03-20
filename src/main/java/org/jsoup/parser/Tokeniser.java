@@ -17,14 +17,14 @@ class Tokeniser {
 
     private TokeniserState state = TokeniserState.Data; // current tokenisation state
     private Token emitPending; // the token we are about to emit on next read
-    private boolean isEmitPending = false;
+    private boolean isEmitPending;
     private StringBuilder charBuffer = new StringBuilder(); // buffers characters to output as one token
     StringBuilder dataBuffer; // buffers data looking for </script>
 
     Token.Tag tagPending; // tag we are building up
     Token.Doctype doctypePending; // doctype building up
     Token.Comment commentPending; // comment building up
-    private Token.StartTag lastStartTag; // the last start tag emitted, to test appropriate end tag
+    private Token.StartTag lastStartTag; // the last start tag emitted, to org.jsoup.test appropriate end tag
     private boolean selfClosingFlagAcknowledged = true;
 
     Tokeniser(CharacterReader reader, ParseErrorList errors) {
@@ -80,9 +80,11 @@ class Tokeniser {
         charBuffer.append(c);
     }
 
-    TokeniserState getState() {
-        return state;
-    }
+// --Commented out by Inspection START (3/20/13 10:02 AM):
+//    TokeniserState getState() {
+//        return state;
+//    }
+// --Commented out by Inspection STOP (3/20/13 10:02 AM)
 
     void transition(TokeniserState state) {
         this.state = state;
@@ -109,7 +111,7 @@ class Tokeniser {
         if (reader.matchConsume("#")) { // numbered
             boolean isHexMode = reader.matchConsumeIgnoreCase("X");
             String numRef = isHexMode ? reader.consumeHexSequence() : reader.consumeDigitSequence();
-            if (numRef.length() == 0) { // didn't match anything
+            if (numRef.isEmpty()) { // didn't match anything
                 characterReferenceError("numeric reference with no numerals");
                 reader.rewindToMark();
                 return null;
@@ -122,7 +124,7 @@ class Tokeniser {
                 charval = Integer.valueOf(numRef, base);
             } catch (NumberFormatException e) {
             } // skip
-            if (charval == -1 || (charval >= 0xD800 && charval <= 0xDFFF) || charval > 0x10FFFF) {
+            if (charval == -1 || charval >= 0xD800 && charval <= 0xDFFF || charval > 0x10FFFF) {
                 characterReferenceError("character outside of valid range");
                 return replacementChar;
             } else {
@@ -135,7 +137,7 @@ class Tokeniser {
             String nameRef = reader.consumeLetterThenDigitSequence();
             boolean looksLegit = reader.matches(';');
             // found if a base named entity without a ;, or an extended entity with the ;.
-            boolean found = (Entities.isBaseNamedEntity(nameRef) || (Entities.isNamedEntity(nameRef) && looksLegit));
+            boolean found = Entities.isBaseNamedEntity(nameRef) || Entities.isNamedEntity(nameRef) && looksLegit;
 
             if (!found) {
                 reader.rewindToMark();
@@ -185,9 +187,7 @@ class Tokeniser {
     }
 
     boolean isAppropriateEndTagToken() {
-        if (lastStartTag == null)
-            return false;
-        return tagPending.tagName.equals(lastStartTag.tagName);
+        return lastStartTag != null && tagPending.tagName.equals(lastStartTag.tagName);
     }
 
     String appropriateEndTagName() {
@@ -214,12 +214,8 @@ class Tokeniser {
             errors.add(new ParseError(reader.pos(), errorMsg));
     }
 
-    boolean currentNodeInHtmlNS() {
-        // todo: implement namespaces correctly
-        return true;
-        // Element currentNode = currentNode();
-        // return currentNode != null && currentNode.namespace().equals("HTML");
-    }
+
+
 
     /**
      * Utility method to consume reader and unescape entities found within.
